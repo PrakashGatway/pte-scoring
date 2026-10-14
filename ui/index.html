@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PTE Audio Lab</title>
+  <link rel="stylesheet" href="/ui/style.css">
+  <script src="/ui/app.js" defer></script>
+</head>
+<body>
+  <header><a class="brand" href="/">PTE<span>Audio Lab</span></a><span id="connection" class="connection">Checking service…</span></header>
+  <main>
+    <div class="intro"><span class="eyebrow">LOCAL PRACTICE WORKSPACE</span><h1>Hear it. Test it.<br><span>Understand your response.</span></h1><p>Upload a spoken answer and explore its transcript, content, word confidence and pauses.</p></div>
+    <div class="workspace">
+      <section class="input-panel" aria-labelledby="input-heading">
+        <h2 id="input-heading">Your recording</h2>
+        <form id="form">
+          <div id="dropzone" class="dropzone">
+            <div class="upload-icon" aria-hidden="true">↑</div>
+            <label for="file">Choose an audio file</label><p>or drag and drop it here</p><small>WAV, MP3, WebM · up to 10 MB · 4 minutes</small>
+            <input id="file" type="file" accept="audio/*,.wav,.mp3,.webm,.m4a,.ogg,.flac">
+          </div>
+          <div class="file-row"><span id="filename">No recording selected</span><button type="button" id="sample" class="text-button">Try sample audio</button></div>
+          <audio id="player" controls hidden></audio>
+          <label for="type">Question type</label>
+          <select id="type"><option value="RA">Read Aloud</option><option value="RS">Repeat Sentence</option><option value="DI">Describe Image</option><option value="RL">Retell Lecture</option><option value="SGD">Summarize Group Discussion</option><option value="RTS">Respond to a Situation</option><option value="ASQ">Answer Short Question</option></select>
+          <label for="context" id="context-label">Reference text</label>
+          <textarea id="context" rows="4" required maxlength="12000" placeholder="Enter the exact text the student should read…"></textarea>
+          <p id="context-help" class="help">The transcript is compared with this text to find missed, extra and changed words.</p>
+          <label class="check"><input id="proxy" type="checkbox" checked><span>Include experimental audio scores<small>Uses word recognition confidence and speaking pace. These scores are not validated PTE pronunciation marks.</small></span></label>
+          <details class="settings"><summary>Service access</summary><label for="service-key">Service key (only if configured)</label><input id="service-key" type="password" autocomplete="off" placeholder="Optional shared key"></details>
+          <button id="submit" class="primary" type="submit">Analyze recording <span aria-hidden="true">↗</span></button>
+          <p id="status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="output-panel" aria-labelledby="output-heading">
+        <div class="section-head"><h2 id="output-heading">Response analysis</h2><button id="download" type="button" class="text-button" hidden>Download JSON ↓</button></div>
+        <div id="empty" class="empty"><div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h3>Your results will appear here</h3><p>Choose a recording and add the question context,<br>or try the included sample to see how it works.</p></div>
+        <div id="results" hidden>
+          <div id="result-state" class="result-state"></div>
+          <div class="metrics"><div><span>Raw practice score</span><strong id="score">—</strong></div><div><span>Correctness</span><strong id="correctness">—</strong></div><div><span>Audio length</span><strong id="duration">—</strong></div></div>
+          <h3>Transcript</h3><p id="transcript" class="transcript"></p>
+          <div class="section-head"><h3>Trait scores</h3><span class="muted">Raw points</span></div><div id="traits"></div>
+          <h3>Word confidence &amp; pauses</h3><p class="help">Green ≥80%, yellow ≥50%, red &lt;50% recognition confidence. A slash marks a pause of 0.5 seconds or longer.</p><div id="words" class="words"></div>
+          <div id="comparison-block"><h3>Content comparison</h3><p class="help">Red words were missed. Crossed-out words were added or replaced.</p><div id="comparison" class="words"></div></div>
+          <div class="diagnostics"><div><span>Speaking pace</span><strong id="pace"></strong></div><div><span>Recognition confidence</span><strong id="confidence"></strong></div></div>
+          <h3>Feedback</h3><ul id="feedback"></ul>
+          <details class="raw"><summary>Full API response</summary><pre id="json"></pre></details>
+        </div>
+      </section>
+    </div>
+    <p class="notice"><strong>Practice estimates.</strong> Audio scores use uncalibrated proxies. The current small language model failed relevance checks, so marks for Describe Image, Retell Lecture, Group Discussion and Situation responses need human review.</p>
+  </main>
+  <footer>Audio is processed on this computer. This service does not save your uploaded recordings.<a href="/docs" target="_blank" rel="noopener">API documentation ↗</a></footer>
+</body>
+</html>

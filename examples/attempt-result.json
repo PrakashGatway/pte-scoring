@@ -1,0 +1,678 @@
+{
+  "attempt_id": "node-demo",
+  "score_kind": "uncalibrated_practice_estimate",
+  "report": {
+    "speaking": {
+      "rows": [
+        {
+          "section": "Speaking",
+          "item": "DI",
+          "contribute": 31,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "SGD",
+          "contribute": 19,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RS",
+          "contribute": 16,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RTS",
+          "contribute": 13,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RL",
+          "contribute": 13,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RA",
+          "contribute": 9,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        }
+      ],
+      "complete": false,
+      "weight_total": 101,
+      "coverage_percent": 0,
+      "correctness": null,
+      "practice_score_10_90": null,
+      "partial_correctness": null
+    },
+    "writing": {
+      "rows": [
+        {
+          "section": "Writing",
+          "item": "WE",
+          "contribute": 31,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Writing",
+          "item": "SWT",
+          "contribute": 28,
+          "my_correctness": null,
+          "target": 95,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "WFD",
+          "contribute": 23,
+          "my_correctness": 87.5,
+          "target": 90,
+          "status": "Bad",
+          "question_count": 1,
+          "scored_count": 1
+        },
+        {
+          "section": "Listening",
+          "item": "SST",
+          "contribute": 18,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        }
+      ],
+      "complete": false,
+      "weight_total": 100,
+      "coverage_percent": 23,
+      "correctness": null,
+      "practice_score_10_90": null,
+      "partial_correctness": 87.5
+    },
+    "reading": {
+      "rows": [
+        {
+          "section": "Reading",
+          "item": "FIB",
+          "contribute": 25,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Writing",
+          "item": "SWT",
+          "contribute": 23,
+          "my_correctness": null,
+          "target": 95,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "FIB_DD",
+          "contribute": 20,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "HIW",
+          "contribute": 13,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "RO",
+          "contribute": 9,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "MCM_R",
+          "contribute": 5,
+          "my_correctness": 0,
+          "target": 50,
+          "status": "Bad",
+          "question_count": 1,
+          "scored_count": 1
+        },
+        {
+          "section": "Listening",
+          "item": "HCS",
+          "contribute": 3,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "MCS_R",
+          "contribute": 3,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        }
+      ],
+      "complete": false,
+      "weight_total": 101,
+      "coverage_percent": 4.95,
+      "correctness": null,
+      "practice_score_10_90": null,
+      "partial_correctness": 0
+    },
+    "listening": {
+      "rows": [
+        {
+          "section": "Speaking",
+          "item": "SGD",
+          "contribute": 20,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RS",
+          "contribute": 17,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "WFD",
+          "contribute": 13,
+          "my_correctness": 87.5,
+          "target": 90,
+          "status": "Bad",
+          "question_count": 1,
+          "scored_count": 1
+        },
+        {
+          "section": "Speaking",
+          "item": "RL",
+          "contribute": 13,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "SST",
+          "contribute": 10,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "FIB_L",
+          "contribute": 8,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "HIW",
+          "contribute": 8,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "ASQ",
+          "contribute": 4,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "MCM_L",
+          "contribute": 3,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "MCS_L",
+          "contribute": 2,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "HCS",
+          "contribute": 2,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "SMW",
+          "contribute": 1,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        }
+      ],
+      "complete": false,
+      "weight_total": 101,
+      "coverage_percent": 12.87,
+      "correctness": null,
+      "practice_score_10_90": null,
+      "partial_correctness": 87.5
+    },
+    "overall": {
+      "rows": [
+        {
+          "section": "Speaking",
+          "item": "RA",
+          "contribute": 4,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RS",
+          "contribute": 7,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "DI",
+          "contribute": 15,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RL",
+          "contribute": 6,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "ASQ",
+          "contribute": 2,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "SGD",
+          "contribute": 9,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Speaking",
+          "item": "RTS",
+          "contribute": 6,
+          "my_correctness": null,
+          "target": 86,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Writing",
+          "item": "SWT",
+          "contribute": 7,
+          "my_correctness": null,
+          "target": 95,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Writing",
+          "item": "WE",
+          "contribute": 7,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "FIB",
+          "contribute": 7,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "MCM_R",
+          "contribute": 1,
+          "my_correctness": 0,
+          "target": 50,
+          "status": "Bad",
+          "question_count": 1,
+          "scored_count": 1
+        },
+        {
+          "section": "Reading",
+          "item": "RO",
+          "contribute": 3,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "FIB_DD",
+          "contribute": 6,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Reading",
+          "item": "MCS_R",
+          "contribute": 0.5,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "SST",
+          "contribute": 4,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "MCM_L",
+          "contribute": 1,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "FIB_L",
+          "contribute": 3,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "HCS",
+          "contribute": 0.5,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "MCS_L",
+          "contribute": 0.5,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "SMW",
+          "contribute": 1,
+          "my_correctness": null,
+          "target": 50,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "HIW",
+          "contribute": 4,
+          "my_correctness": null,
+          "target": 90,
+          "status": "Not attempted",
+          "question_count": 0,
+          "scored_count": 0
+        },
+        {
+          "section": "Listening",
+          "item": "WFD",
+          "contribute": 5,
+          "my_correctness": 87.5,
+          "target": 90,
+          "status": "Bad",
+          "question_count": 1,
+          "scored_count": 1
+        }
+      ],
+      "complete": false,
+      "weight_total": 99.5,
+      "coverage_percent": 6.03,
+      "correctness": null,
+      "practice_score_10_90": null,
+      "partial_correctness": 72.92
+    }
+  },
+  "questions": [
+    {
+      "id": "mcq",
+      "type": "MCM_R",
+      "section": "Reading",
+      "status": "scored",
+      "method": "answer_key",
+      "score": 0,
+      "max_score": 2,
+      "correctness": 0,
+      "traits": {
+        "content": {
+          "score": 0,
+          "max": 2
+        }
+      },
+      "pending_traits": [],
+      "details": {
+        "correct_selected": [
+          "a"
+        ],
+        "incorrect_selected": [
+          "x"
+        ],
+        "missed": [
+          "b"
+        ],
+        "penalty": 1
+      },
+      "feedback": []
+    },
+    {
+      "id": "dictation",
+      "type": "WFD",
+      "section": "Listening",
+      "status": "scored",
+      "method": "answer_key",
+      "score": 7,
+      "max_score": 8,
+      "correctness": 87.5,
+      "traits": {
+        "content": {
+          "score": 7,
+          "max": 8
+        }
+      },
+      "pending_traits": [],
+      "details": {
+        "words": [
+          {
+            "word": "they",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "have",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "work",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "to",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "keep",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "them",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "going",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "enough",
+            "status": "missed",
+            "color": "red"
+          }
+        ]
+      },
+      "feedback": []
+    }
+  ],
+  "assumptions": [
+    "Weights come from the supplied deck. Reading totals 101%; normalized by its weight total.",
+    "Overall is calculated independently from question-type weights, never averaged from modules.",
+    "Three <1% overall weights use 0.5%. Overall weights are normalized; these are approximate.",
+    "10–90 display uses 10 + 0.8 × correctness; this mapping is uncalibrated and is not Pearson scoring.",
+    "Type correctness averages per-question percentages. Missing types and pending assessments prevent a complete score.",
+    "Speech evidence must come from a trusted acoustic assessor, not the learner client."
+  ]
+}

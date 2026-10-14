@@ -1,0 +1,187 @@
+{
+  "id": "audio-ra",
+  "type": "RA",
+  "section": "Speaking",
+  "status": "scored",
+  "method": "uncalibrated_audio_practice_proxy",
+  "score": 17.49,
+  "max_score": 18,
+  "correctness": 97.1667,
+  "traits": {
+    "content": {
+      "score": 8,
+      "max": 8
+    },
+    "pronunciation": {
+      "score": 4.89,
+      "max": 5
+    },
+    "oral_fluency": {
+      "score": 4.6,
+      "max": 5
+    }
+  },
+  "pending_traits": [],
+  "details": {
+    "words": [
+      {
+        "word": "they",
+        "status": "correct"
+      },
+      {
+        "word": "have",
+        "status": "correct"
+      },
+      {
+        "word": "enough",
+        "status": "correct"
+      },
+      {
+        "word": "work",
+        "status": "correct"
+      },
+      {
+        "word": "to",
+        "status": "correct"
+      },
+      {
+        "word": "keep",
+        "status": "correct"
+      },
+      {
+        "word": "them",
+        "status": "correct"
+      },
+      {
+        "word": "going",
+        "status": "correct"
+      }
+    ],
+    "reference_word_count": 8,
+    "response_word_count": 8,
+    "edit_errors": 0,
+    "speech_source": "uncalibrated_local_asr_and_timing_proxy",
+    "pronunciation_words": [
+      {
+        "word": "They",
+        "score": 83.02,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      },
+      {
+        "word": "have",
+        "score": 99.67,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      },
+      {
+        "word": "enough",
+        "score": 99.88,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      },
+      {
+        "word": "work",
+        "score": 99.91,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      },
+      {
+        "word": "to",
+        "score": 99.95,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      },
+      {
+        "word": "keep",
+        "score": 99.84,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      },
+      {
+        "word": "them",
+        "score": 99.91,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      },
+      {
+        "word": "going.",
+        "score": 99.86,
+        "color": "green",
+        "pause_after": "",
+        "pause_seconds": 0
+      }
+    ]
+  },
+  "feedback": [
+    "Audio trait scores and colors are uncalibrated ASR/timing proxies."
+  ],
+  "audio": {
+    "transcript": "They have enough work to keep them going.",
+    "duration_seconds": 2.75,
+    "rms": 0.08459,
+    "words_per_minute": 250,
+    "pause_ratio": 0,
+    "recognition_confidence": 0.978,
+    "model": "tiny.en",
+    "proxy_scores_used": true,
+    "words": [
+      {
+        "word": "They",
+        "start": 0,
+        "end": 0.36,
+        "recognition_confidence": 0.8302446603775024
+      },
+      {
+        "word": "have",
+        "start": 0.36,
+        "end": 0.56,
+        "recognition_confidence": 0.9966697096824646
+      },
+      {
+        "word": "enough",
+        "start": 0.56,
+        "end": 0.82,
+        "recognition_confidence": 0.9988034963607788
+      },
+      {
+        "word": "work",
+        "start": 0.82,
+        "end": 1.06,
+        "recognition_confidence": 0.999053418636322
+      },
+      {
+        "word": "to",
+        "start": 1.06,
+        "end": 1.22,
+        "recognition_confidence": 0.999539852142334
+      },
+      {
+        "word": "keep",
+        "start": 1.22,
+        "end": 1.44,
+        "recognition_confidence": 0.9984235763549805
+      },
+      {
+        "word": "them",
+        "start": 1.44,
+        "end": 1.64,
+        "recognition_confidence": 0.9991455078125
+      },
+      {
+        "word": "going.",
+        "start": 1.64,
+        "end": 1.92,
+        "recognition_confidence": 0.9986415505409241
+      }
+    ],
+    "limitation": "Recognition confidence is not a pronunciation measurement; timing fluency and proxy scores need validation with human-rated recordings."
+  }
+}

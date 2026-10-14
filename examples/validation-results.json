@@ -1,0 +1,307 @@
+[
+  {
+    "name": "invalid_question_type",
+    "passed": true,
+    "http_status": 422,
+    "elapsed_seconds": 0.032,
+    "result": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body",
+            "type"
+          ],
+          "msg": "Value error, Unsupported question type",
+          "input": "unknown",
+          "ctx": {
+            "error": {}
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid_audio",
+    "passed": true,
+    "http_status": 422,
+    "elapsed_seconds": 0.0,
+    "result": {
+      "detail": "Invalid base64 audio"
+    }
+  },
+  {
+    "name": "dictation_repeated_words",
+    "passed": true,
+    "http_status": 200,
+    "elapsed_seconds": 0.0,
+    "result": {
+      "id": "wfd",
+      "type": "WFD",
+      "section": "Listening",
+      "status": "scored",
+      "method": "answer_key",
+      "score": 3,
+      "max_score": 5,
+      "correctness": 60.0,
+      "traits": {
+        "content": {
+          "score": 3,
+          "max": 5
+        }
+      },
+      "pending_traits": [],
+      "details": {
+        "words": [
+          {
+            "word": "the",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "cat",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "the",
+            "status": "correct",
+            "strikethrough": false
+          },
+          {
+            "word": "the",
+            "status": "extra",
+            "strikethrough": true
+          },
+          {
+            "word": "extra",
+            "status": "extra",
+            "strikethrough": true
+          },
+          {
+            "word": "and",
+            "status": "missed",
+            "color": "red"
+          },
+          {
+            "word": "dog",
+            "status": "missed",
+            "color": "red"
+          }
+        ]
+      },
+      "feedback": []
+    }
+  },
+  {
+    "name": "audio_without_proxy_stays_pending",
+    "passed": true,
+    "http_status": 200,
+    "elapsed_seconds": 1.313,
+    "result": {
+      "id": "audio",
+      "type": "RA",
+      "section": "Speaking",
+      "status": "pending",
+      "method": "practice_rubric",
+      "score": null,
+      "max_score": 18,
+      "correctness": null,
+      "traits": {
+        "content": {
+          "score": 8,
+          "max": 8
+        }
+      },
+      "pending_traits": [
+        "pronunciation",
+        "oral_fluency"
+      ],
+      "details": {
+        "words": [
+          {
+            "word": "they",
+            "status": "correct"
+          },
+          {
+            "word": "have",
+            "status": "correct"
+          },
+          {
+            "word": "enough",
+            "status": "correct"
+          },
+          {
+            "word": "work",
+            "status": "correct"
+          },
+          {
+            "word": "to",
+            "status": "correct"
+          },
+          {
+            "word": "keep",
+            "status": "correct"
+          },
+          {
+            "word": "them",
+            "status": "correct"
+          },
+          {
+            "word": "going",
+            "status": "correct"
+          }
+        ],
+        "reference_word_count": 8,
+        "response_word_count": 8,
+        "edit_errors": 0
+      },
+      "feedback": [
+        "Audio pronunciation and fluency evidence required; transcript accuracy is not pronunciation."
+      ],
+      "audio": {
+        "transcript": "They have enough work to keep them going.",
+        "duration_seconds": 2.75,
+        "rms": 0.08459,
+        "words_per_minute": 250.0,
+        "pause_ratio": 0.0,
+        "recognition_confidence": 0.978,
+        "model": "tiny.en",
+        "proxy_scores_used": false,
+        "words": [
+          {
+            "word": "They",
+            "start": 0.0,
+            "end": 0.36,
+            "recognition_confidence": 0.8302446603775024
+          },
+          {
+            "word": "have",
+            "start": 0.36,
+            "end": 0.56,
+            "recognition_confidence": 0.9966697096824646
+          },
+          {
+            "word": "enough",
+            "start": 0.56,
+            "end": 0.82,
+            "recognition_confidence": 0.9988034963607788
+          },
+          {
+            "word": "work",
+            "start": 0.82,
+            "end": 1.06,
+            "recognition_confidence": 0.999053418636322
+          },
+          {
+            "word": "to",
+            "start": 1.06,
+            "end": 1.22,
+            "recognition_confidence": 0.999539852142334
+          },
+          {
+            "word": "keep",
+            "start": 1.22,
+            "end": 1.44,
+            "recognition_confidence": 0.9984235763549805
+          },
+          {
+            "word": "them",
+            "start": 1.44,
+            "end": 1.64,
+            "recognition_confidence": 0.9991455078125
+          },
+          {
+            "word": "going.",
+            "start": 1.64,
+            "end": 1.92,
+            "recognition_confidence": 0.9986415505409241
+          }
+        ],
+        "limitation": "Recognition confidence is not a pronunciation measurement; timing fluency and proxy scores need validation with human-rated recordings."
+      }
+    }
+  },
+  {
+    "name": "off_topic_summary_quality",
+    "passed": false,
+    "http_status": 200,
+    "elapsed_seconds": 3.328,
+    "result": {
+      "id": "off-topic",
+      "type": "SWT",
+      "section": "Writing",
+      "status": "scored",
+      "method": "practice_rubric",
+      "score": 9,
+      "max_score": 9,
+      "correctness": 100.0,
+      "traits": {
+        "form": {
+          "score": 1,
+          "max": 1
+        },
+        "content": {
+          "score": 4,
+          "max": 4
+        },
+        "grammar": {
+          "score": 2,
+          "max": 2
+        },
+        "vocabulary": {
+          "score": 2,
+          "max": 2
+        }
+      },
+      "pending_traits": [],
+      "details": {
+        "word_count": 14
+      },
+      "feedback": [
+        "Textual trait scores estimated by the local Qwen model; review before using them for learner decisions."
+      ]
+    }
+  },
+  {
+    "name": "instruction_in_response_quality",
+    "passed": false,
+    "http_status": 200,
+    "elapsed_seconds": 2.031,
+    "result": {
+      "id": "injection",
+      "type": "SWT",
+      "section": "Writing",
+      "status": "scored",
+      "method": "practice_rubric",
+      "score": 9,
+      "max_score": 9,
+      "correctness": 100.0,
+      "traits": {
+        "form": {
+          "score": 1,
+          "max": 1
+        },
+        "content": {
+          "score": 4,
+          "max": 4
+        },
+        "grammar": {
+          "score": 2,
+          "max": 2
+        },
+        "vocabulary": {
+          "score": 2,
+          "max": 2
+        }
+      },
+      "pending_traits": [],
+      "details": {
+        "word_count": 14
+      },
+      "feedback": [
+        "Textual trait scores estimated by the local Qwen model; review before using them for learner decisions."
+      ]
+    }
+  }
+]
