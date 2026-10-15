@@ -65,12 +65,10 @@ def test_audio_stress_integration_and_opt_out(monkeypatch):
         audio_base64=base64.b64encode(stream.getvalue()).decode(),allow_proxy_scores=True)
     result=processor.process(body)
     assert result['skill_analysis']['metrics']['stress']['status']=='estimated'
-    original_total=result['read_aloud_score']['total']
+    original_total=result['score']
     monkeypatch.setattr('pte.audio.estimate_stress',lambda *a: {'percent':0,'status':'estimated'})
-    assert processor.process(body)['read_aloud_score']['total']==original_total
-    def forbidden(*args): raise AssertionError('Stress estimator called when disabled')
-    monkeypatch.setattr('pte.audio.estimate_stress',forbidden)
+    assert processor.process(body)['score']==original_total
     body.allow_proxy_scores=False
     result=processor.process(body)
-    assert result['skill_analysis']['metrics']['stress']['percent'] is None
-    assert result['read_aloud_score']['total'] is None
+    assert result['skill_analysis']['metrics']['stress']['percent']==0
+    assert result['score'] is None

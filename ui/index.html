@@ -9,13 +9,17 @@
 <body>
   <header><a class="brand" href="/">PTE<span>Practice Lab</span></a><span id="connection" class="connection">Checking service…</span></header>
   <main>
-    <div class="intro"><span class="eyebrow">LOCAL PRACTICE WORKSPACE</span><h1>Hear it. Test it.<br><span>Understand your response.</span></h1><p>Analyze a spoken recording or get AI feedback on your summary or essay.</p></div>
+    <div class="intro"><span class="eyebrow">LOCAL PRACTICE WORKSPACE</span><h1>Hear it. Test it.<br><span>Understand your response.</span></h1><p>Practice every PTE Academic question type with published item rules and clear feedback.</p></div>
     <div class="workspace">
       <section class="input-panel" aria-labelledby="input-heading">
         <h2 id="input-heading">Your recording</h2>
         <form id="form">
           <label for="type">Question type</label>
-          <select id="type"><option value="RA">Read Aloud</option><option value="RS">Repeat Sentence</option><option value="DI">Describe Image</option><option value="RL">Retell Lecture</option><option value="SGD">Summarize Group Discussion</option><option value="RTS">Respond to a Situation</option><option value="ASQ">Answer Short Question</option><option value="SWT">Summarize Written Text</option><option value="WE">Write Essay</option></select>
+          <select id="type">
+            <optgroup label="Speaking and Writing"><option value="RA">Read Aloud</option><option value="RS">Repeat Sentence</option><option value="DI">Describe Image</option><option value="RL">Retell Lecture</option><option value="ASQ">Answer Short Question</option><option value="SGD">Summarize Group Discussion</option><option value="RTS">Respond to a Situation</option><option value="SWT">Summarize Written Text</option><option value="WE">Write Essay</option></optgroup>
+            <optgroup label="Reading"><option value="FIB">Fill in the Blanks (Dropdown)</option><option value="MCM_R">Multiple Choice, Multiple Answers</option><option value="RO">Reorder Paragraphs</option><option value="FIB_DD">Fill in the Blanks (Drag and Drop)</option><option value="MCS_R">Multiple Choice, Single Answer</option></optgroup>
+            <optgroup label="Listening"><option value="SST">Summarize Spoken Text</option><option value="MCM_L">Multiple Choice, Multiple Answers</option><option value="FIB_L">Fill in the Blanks (Type In)</option><option value="HCS">Highlight Correct Summary</option><option value="MCS_L">Multiple Choice, Single Answer</option><option value="SMW">Select Missing Word</option><option value="HIW">Highlight Incorrect Words</option><option value="WFD">Write from Dictation</option></optgroup>
+          </select>
           <div id="audio-input">
           <div id="dropzone" class="dropzone">
             <div class="upload-icon" aria-hidden="true">↑</div>
@@ -28,8 +32,9 @@
           <label for="context" id="context-label">Reference text</label>
           <textarea id="context" rows="4" required maxlength="12000" placeholder="Enter the exact text the student should read…"></textarea>
           <p id="context-help" class="help">The transcript is compared with this text to find missed, extra and changed words.</p>
+          <div id="structured-input" hidden><label for="answer-key">Correct answer or key (one per line)</label><textarea id="answer-key" rows="3" maxlength="12000" placeholder="Enter correct answer words, option IDs, or paragraph IDs…"></textarea><div id="student-answer-input"><label for="student-answer">Your answer (one per line when the task has multiple selections)</label><textarea id="student-answer" rows="3" maxlength="12000" placeholder="Enter the student's answer…"></textarea></div><div id="options-input"><label for="options">Option IDs (optional, one per line)</label><textarea id="options" rows="3" maxlength="12000" placeholder="a\nb\nc"></textarea></div><p id="structured-guidance" class="help"></p></div>
           <div id="writing-input" hidden><label for="writing-answer">Your written answer</label><textarea id="writing-answer" rows="10" maxlength="12000" placeholder="Type your answer here…"></textarea><p id="word-count" class="help" aria-live="polite">0 words</p><p id="writing-guidance" class="help"></p></div>
-          <label id="proxy-option" class="check"><input id="proxy" type="checkbox" checked><span>Include experimental audio scores<small>Uses word recognition confidence and speaking pace. These scores are not validated PTE pronunciation marks.</small></span></label>
+          <label id="proxy-option" class="check"><input id="proxy" type="checkbox"><span>Include experimental audio estimates<small>Uses recognition confidence and timing as proxies. They are not validated pronunciation or fluency scores.</small></span></label>
           <details class="settings"><summary>Service access</summary><label for="service-key">Service key (only if configured)</label><input id="service-key" type="password" autocomplete="off" placeholder="Optional shared key"></details>
           <button id="submit" class="primary" type="submit">Analyze recording <span aria-hidden="true">↗</span></button>
           <p id="status" role="status" aria-live="polite"></p>
@@ -57,7 +62,7 @@
         </div>
       </section>
     </div>
-    <p class="notice"><strong>Practice estimates.</strong> Audio scores use uncalibrated proxies. Local AI writing and spoken-content assessments can be inaccurate and need human review.</p>
+    <p class="notice"><strong>PTE practice scoring.</strong> Item points follow Pearson’s published task rubrics where available. Local AI and audio estimates are not Pearson’s calibrated 10–90 scores and may be inaccurate.</p>
   </main>
   <footer>Audio is processed on this computer. This service does not save your uploaded recordings.<a href="/docs" target="_blank" rel="noopener">API documentation ↗</a></footer>
 </body>

@@ -7,20 +7,6 @@ from .llm import OllamaAssessor, AssessmentUnavailable
 def tokens(text):
     return re.findall(r"[\w]+(?:['’][\w]+)*",text.casefold())
 
-def read_aloud_summary(traits, pending):
-    """Equal normalized trait weights for a practice display, not Pearson calibration."""
-    names=('content','pronunciation','oral_fluency')
-    ratios={name: (min(1,max(0,traits[name]['score']/traits[name]['max']))
-                  if name in traits and traits[name]['max'] else None) for name in names}
-    def scaled(ratio): return int(10+80*ratio+0.5)
-    complete=not pending and all(value is not None for value in ratios.values())
-    return {'score_kind':'uncalibrated_practice_estimate','min_score':10,'max_score':90,
-            'total':scaled(sum(ratios.values())/3) if complete else None,
-            'traits':{name:scaled(value) if value is not None else None for name,value in ratios.items()},
-            'weights':{name:1/3 for name in names},
-            'method':'equal_normalized_traits_v1',
-            'explanation':'Each trait = 10 + 80 × raw score / raw maximum. Total = 10 + 80 × mean of the three normalized traits, rounded once. Practice conversion, not an official Pearson score.'}
-
 def alignment(reference,response):
     a,b=tokens(reference),tokens(response)
     rows=[]; errors=0; matches=0
@@ -46,13 +32,17 @@ def form_score(t,text):
     if t=='SWT':
         sentences=[s for s in re.split(r'[.!?]+(?:\s+|$)',text.strip()) if s.strip()]
         return int(5<=n<=75 and len(sentences)==1 and punct and not allcaps)
-    if allcaps or not punct or all(line.strip().startswith(('-', '*','•')) for line in text.splitlines() if line.strip()): return 0
+    sentences=[s.strip() for s in re.split(r'[.!?]+',text) if s.strip()]
+    lines=[line.strip() for line in text.splitlines() if line.strip()]
+    bullet_only=bool(lines) and all(line.startswith(('-', '*','•')) for line in lines)
+    very_short_only=bool(sentences) and all(len(tokens(s))<=4 for s in sentences)
+    if allcaps or not punct or bullet_only or very_short_only: return 0
     if t=='WE': return 2 if 200<=n<=300 else 1 if 120<=n<=380 else 0
     return 2 if 50<=n<=70 else 1 if 40<=n<=100 else 0
 
 def score_question(q,assessor=None):
     assessor=assessor or OllamaAssessor(); t=q.type
-    traits={}; details={}; feedback=[]; pending=[]; method='answer_key'
+    traits={}; details={}; feedback=[]; pending=[]; method='normalized_read_aloud_practice_scale' if t=='RA' else 'answer_key'
     def trait(name,value,maximum): traits[name]={'score':value,'max':maximum}
     empty=not q.response or (isinstance(q.response,str) and not q.response.strip())
     maxima=RUBRICS.get(t,{'content':len(tokens(q.reference)),'pronunciation':5,'oral_fluency':5} if t=='RA' else {})
@@ -68,7 +58,7 @@ def score_question(q,assessor=None):
     elif t in {'MCS_R','MCS_L','HCS','SMW','ASQ'}:
         keys=q.correct if isinstance(q.correct,list) else [q.correct]
         normalize=(lambda s:' '.join(tokens(s))) if t=='ASQ' else (lambda s:s)
-        trait('content',int(normalize(q.response) in [normalize(s) for s in keys]),1)
+        trait('vocabulary' if t=='ASQ' else 'content',int(normalize(q.response) in [normalize(s) for s in keys]),1)
     elif t in {'FIB','FIB_DD','FIB_L'}:
         details['blanks']=[{'index':i,'expected':w,'actual':q.response[i] if i<len(q.response) else '',
             'correct':i<len(q.response) and w.strip().casefold()==q.response[i].strip().casefold()} for i,w in enumerate(q.correct)]
@@ -86,11 +76,18 @@ def score_question(q,assessor=None):
         rows.extend({'word':w,'status':'missed','color':'red'} for w,n in remaining.items() for _ in range(n))
         details['words']=rows; trait('content',score,len(tokens(q.reference)))
     else:
-        method='practice_rubric'
+        method='published_item_rubric_with_local_ai_estimates'
+        if t=='RA': method='normalized_read_aloud_practice_scale'
         if t in {'RA','RS'}:
             rows,errors,matches=alignment(q.reference,q.response)
             details={'words':rows,'reference_word_count':len(tokens(q.reference)),'response_word_count':len(tokens(q.response)),'edit_errors':errors}
-            if t=='RA': trait('content',max(0,maxima['content']-errors),maxima['content'])
+            if t=='RA':
+                prompt_words=len(tokens(q.reference))
+                credited_words=max(0,prompt_words-errors)
+                content_score=round(5*credited_words/prompt_words,2) if prompt_words else 0
+                trait('content',content_score,maxima['content'])
+                details.update({'content_credited_words':credited_words,'content_raw_max':prompt_words,
+                                'content_scale':'proportional_0_to_5_practice_score'})
             else:
                 ratio=matches/len(tokens(q.reference))
                 trait('content',3 if tokens(q.reference)==tokens(q.response) else 2 if ratio>=0.5 else 1 if matches else 0,3)
@@ -128,14 +125,12 @@ def score_question(q,assessor=None):
     correctness=round(100*total/maximum,4) if maximum and not pending else None
     result={'id':q.id,'type':t,'section':SECTIONS[t],'status':'pending' if pending else 'scored',
        'method':method,'score':round(total,4) if not pending else None,'max_score':sum(maxima.values()) if maxima else maximum,
-       'correctness':correctness,'traits':traits,'pending_traits':pending,'details':details,'feedback':feedback}
-    if t=='RA': result['read_aloud_score']=read_aloud_summary(traits,pending)
-    if t in {'SWT','WE'}:
+       'correctness':correctness,'traits':traits,'pending_traits':pending,'details':details,'feedback':feedback,'response':q.response}
+    if t in {'SWT','WE','SST'}:
         result['writing']={'response':q.response,'word_count':len(tokens(q.response)),
-            'guidance':'Write one sentence of 5–75 words.' if t=='SWT' else 'Write an essay of 200–300 words.',
-            'trait_maxima':maxima,'score_kind':'uncalibrated_practice_estimate',
-            'practice_score_10_90':int(10+80*total/maximum+0.5) if maximum and not pending else None,
-            'limitation':'Local AI feedback and marks may be inaccurate. The 10–90 conversion is a practice mapping, not Pearson scoring.'}
+            'guidance':'Write one sentence of 5–75 words.' if t=='SWT' else 'Write an essay of 200–300 words.' if t=='WE' else 'Write a summary of 50–70 words.',
+            'trait_maxima':maxima,'score_kind':'practice_estimate_using_published_rubric',
+            'limitation':'Raw trait points follow Pearson’s published task rubric. This local AI estimate is not a calibrated Pearson score.'}
     return result
 
 def build_report(attempt,assessor=None,weights=None):
@@ -159,13 +154,12 @@ def build_report(attempt,assessor=None,weights=None):
         reports[module]={'rows':rows,'complete':complete,'weight_total':sum(table.values()),
            'coverage_percent':round(100*coverage/sum(table.values()),2),
            'correctness':round(pct,2) if pct is not None else None,
-           'practice_score_10_90':round(10+0.8*pct) if pct is not None else None,
            'partial_correctness':round(partial/partial_weight,2) if partial_weight else None}
-    return {'attempt_id':attempt.attempt_id,'score_kind':'uncalibrated_practice_estimate',
+    return {'attempt_id':attempt.attempt_id,'score_kind':'practice_weighted_correctness_not_pearson_score',
        'report':reports,'questions':results,'assumptions':[
-       'Weights come from the supplied deck. Reading totals 101%; normalized by its weight total.',
+       'Module and overall weights come from the supplied deck, not Pearson’s scoring engine. Reading totals 101%; normalized by its weight total.',
        'Overall is calculated independently from question-type weights, never averaged from modules.',
        'Three <1% overall weights use 0.5%. Overall weights are normalized; these are approximate.',
-       '10–90 display uses 10 + 0.8 × correctness; this mapping is uncalibrated and is not Pearson scoring.',
+       'No 10–90 score is derived: Pearson’s calibrated reporting model is proprietary and cannot be reconstructed from a local rubric.',
        'Type correctness averages per-question percentages. Missing types and pending assessments prevent a complete score.',
        'Speech evidence must come from a trusted acoustic assessor, not the learner client.']}

@@ -1,9 +1,20 @@
-"""One-time downloads of free model weights. Subsequent inference is local."""
+"""Download free local scoring/transcription models once; later inference is offline."""
 from pathlib import Path
-from huggingface_hub import hf_hub_download
+import shutil, subprocess
 from faster_whisper import WhisperModel
+
 root=Path(__file__).resolve().parent/'models'
-hf_hub_download('Qwen/Qwen2.5-0.5B-Instruct-GGUF','qwen2.5-0.5b-instruct-q5_k_m.gguf',local_dir=root/'qwen')
-hf_hub_download('Qwen/Qwen2.5-1.5B-Instruct-GGUF','qwen2.5-1.5b-instruct-q4_k_m.gguf',local_dir=root/'qwen-writing')
-WhisperModel('tiny.en',device='cpu',compute_type='int8',download_root=str(root))
+model_dir=root/'qwen-semantic'
+model_dir.mkdir(parents=True,exist_ok=True)
+model=model_dir/'qwen2.5-3b-instruct-q4_k_m.gguf'
+model_size=2_104_932_768
+if not model.exists() or model.stat().st_size!=model_size:
+    curl=shutil.which('curl.exe') or shutil.which('curl')
+    if not curl:
+        raise RuntimeError('curl is required to download the 2.1 GB Qwen GGUF model.')
+    url='https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf'
+    subprocess.run([curl,'-L','--fail','--retry','5','--retry-all-errors','--continue-at','-','--output',str(model),url],check=True)
+    if model.stat().st_size!=model_size:
+        raise RuntimeError('Qwen model download is incomplete; rerun this script to resume it.')
+WhisperModel('base.en',device='cpu',compute_type='int8',download_root=str(root))
 print('Local models ready.')

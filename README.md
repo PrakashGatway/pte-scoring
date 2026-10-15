@@ -2,27 +2,27 @@
 
 This project runs Python locally, processes recorded spoken responses with faster-whisper, uses a local Qwen language model for textual assessment, and returns JSON for your Node backend. No paid API or cloud inference is needed. Initial installation downloads free model weights.
 
-The service is your own application around existing open models. A newly trained PTE language/pronunciation model is not included: that requires licensed training data and human-rated recordings. Qwen 0.5B is a small CPU demonstration model and its judgments need review. Larger compatible GGUF models can replace it by setting `PTE_MODEL_PATH`.
+The service follows Pearson’s published per-question scoring rules where public. It cannot reproduce Pearson’s proprietary calibrated 10–90 scoring engine. Local AI and acoustic estimates are practice guidance, not official PTE scores.
 
 ## Run on Windows
 
 Python 3.10+ and Node 22 are used in this workspace.
 
 ```powershell
-cd C:\Users\hp\Documents\ChatGPT\linkdin\pte-scoring
+cd C:\path\to\pte-scoring
 python -m pip install -r requirements.txt
 python -m pip install llama-cpp-python==0.3.36 --only-binary=:all: --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
 python download_models.py
 .\run.ps1
 ```
 
-Models were downloaded and runtime dependencies were installed during implementation. The service binds to loopback, port 8765. Interactive API documentation: http://127.0.0.1:8765/docs. Models load on their first request, so the first request takes longer. The CPU runs models with a lock to prevent concurrent inference on a shared instance. Large batches may need an asynchronous job queue in your backend.
+Models were downloaded and runtime dependencies were installed during implementation. The service binds to loopback, port 8000. Interactive API documentation: http://127.0.0.1:8000/docs. Models load on their first request, so the first request takes longer. The CPU runs models with a lock to prevent concurrent inference on a shared instance. Large batches may need an asynchronous job queue in your backend. Transcription defaults to English-only Whisper `base.en`; set `PTE_WHISPER_MODEL=tiny.en` for faster, lighter inference.
 
 ## Browser audio tester
 
-Open http://127.0.0.1:8765/ to upload or drag in an audio file, play it, choose a spoken question type, and enter its reference or source context. Click **Analyze recording** to see the transcript, raw trait scores, word recognition confidence, pauses, content comparison and complete JSON. **Try sample audio** loads the included synthetic Read Aloud recording and reference. Results can be downloaded as JSON. Turn off experimental audio scores to leave pronunciation and fluency pending. The optional service key is held only in the current page, not saved in browser storage.
+Open http://127.0.0.1:8000/ to upload or drag in an audio file, play it, choose a spoken question type, and enter its reference or source context. Click **Analyze recording** to see the transcript, raw trait scores, word recognition confidence, pauses, content comparison and complete JSON. **Try sample audio** loads the included synthetic Read Aloud recording and reference. Results can be downloaded as JSON. Turn off experimental audio scores to leave pronunciation and fluency pending. The optional service key is held only in the current page, not saved in browser storage.
 
-The UI supports the seven spoken question types. Other question types use the text APIs. The browser page is served by the same Python process; no separate frontend build or Node server is required. Browser QA verified sample analysis, actual file upload, pending trait display with proxies disabled, and JSON download.
+The browser UI covers all 22 supported PTE Academic item types. Spoken responses use local transcription; writing tasks and objective reading/listening answers use text or line-by-line answer-key inputs. The page is served by the same Python process.
 
 Optional environment settings:
 
@@ -41,59 +41,28 @@ Use the same service key in Node. Do not expose this inference service directly 
 Choose **Summarize Written Text** or **Write Essay**, enter the source passage or
 essay prompt, and type the student's response. The form shows a live word count
 and sends text to `/v1/score-question`. Results include raw rubric traits, feedback,
-the submitted answer, word count, and `writing.practice_score_10_90` (10 + 80 times
-the raw-score fraction). Missing model assessments stay pending. The local model
-now requests structured, response-specific feedback for these two writing tasks.
+the submitted answer and word count. No 10–90 conversion is invented. Missing
+model assessments stay pending.
 
-The bundled Qwen 0.5B model is **blocked for writing assessment** after it awarded
-full content marks to unrelated and contradictory summaries. Form checks still
-work. Writing now uses the installed Qwen 1.5B model for experimental scores. Override
-its path with `PTE_WRITING_MODEL_PATH`, or configure `PTE_MODEL_PATH` or an Ollama provider,
-then run `python check_writing_quality.py`. This is a small semantic smoke check,
-not a human-rated accuracy benchmark; passing it does not establish 90% accuracy.
-Writing grades and feedback require human validation before learner decisions.
+Extended responses, including open-response speaking tasks, use a free local Qwen
+3B Q4 model with task-specific published-rubric guidance. Override it with
+`PTE_WRITING_MODEL_PATH` or `PTE_MODEL_PATH`, or configure an Ollama provider.
+`python check_writing_quality.py` runs a small semantic smoke check, not a
+human-rated accuracy benchmark; passing it does not establish 90% accuracy.
 
-On the supplied bioluminescence example, the tested Qwen 1.5B Q4_K_M candidate
-still gave unsupported grammar criticism and undervalued accurate summaries.
-It passed only four of six final semantic smoke checks. It is enabled for
-experimental writing feedback, not as a validated grader or a 90%-accurate service. See `examples/writing-quality-check.json` for outputs.
-These six developer cases are not an accuracy percentage or a PTE calibration set.
+The bundled models are not trained or validated on Pearson’s human-rated response
+set. They can still make incorrect trait judgements. Incomplete feedback is replaced
+with a warning. Do not treat local marks as a 90%-accurate service or as Pearson scores.
 
-### Read Aloud score display
+### Published item scores and audio evidence
 
-Read Aloud responses include `read_aloud_score` in the question, audio and attempt APIs.
-Its `total` and `traits` (content, pronunciation, oral_fluency) are integer practice
-scores from 10 to 90. Each trait uses `10 + 80 * raw_score / raw_maximum`.
-The total uses `10 + 80 * mean(content_ratio, pronunciation_ratio, fluency_ratio)`,
-rounded once to the nearest integer. Equal trait weighting is an explicit practice
-assumption, not Pearson's proprietary score conversion. Normalization prevents
-longer reference passages from increasing content's share of the displayed total.
-For example, content 3/4, pronunciation 2.5/5 and fluency 5/5 display 70, 50 and
-90, with a total of 70/90. Existing zero-content/no-response gates produce 10/90.
-Missing acoustic evidence leaves the total and missing traits null (Pending).
-The existing raw `score`, `max_score`, `traits`, and report calculations are retained.
-The browser displays this summary for Read Aloud; other question types retain raw points.
+Question results use Pearson’s public PTE Academic item rules where available. For this app’s requested practice display, Read Aloud credited words are normalized proportionally to content /5; pronunciation and oral fluency are each /5. The normalized content scale differs from Pearson’s prompt-length content points. Other speaking and writing tasks use their published trait maxima. Objective reading/listening tasks use per-blank, per-word, adjacent-pair or answer-key points, including the published zero-floor penalty for incorrect multiple selections. Writing form checks implement the published SWT, SST and essay word-count bands.
 
-Read Aloud audio responses also include `skill_analysis`, shown as a separate card
-with percentage bars and expandable explanations. Pronunciation accuracy uses mean
-ASR confidence; fluency uses the existing pace/pause estimate; speed shows pace fit
-(100% at 100–230 words/min, reduced outside that range). These are uncalibrated
-diagnostics, not learner percentiles or additional total-score components. Stress
-uses an experimental Praat acoustic variation estimate (see below). With no
-detected speech or experimental scores disabled, percentages are null and the UI
-shows N/A. Each metric includes its status and explanation in downloaded JSON.
+These are question-level points, not a conversion to an official communicative skill or overall score. Pearson’s 10–90 model is proprietary and calibrated against expert ratings; selected answers cannot produce an official predicted score.
 
-Stress estimation (`acoustic_variation_v1`) uses Praat pitch tracking and Whisper
-word boundaries. At least four words and 50% of recognized words must have usable
-timing, recognition confidence >=0.5, and three voiced frames with pitch strength
->=0.6. It measures the 10th–90th percentile spreads of median word pitch (semitones),
-word RMS loudness (dB), and log2 word duration. The displayed percentage is
-`100 * (0.5 * min(pitch_spread/6, 1) + 0.35 * min(loudness_spread/12, 1) + 0.15 * min(duration_spread/1.5, 1))`.
-These caps and weights are unvalidated heuristics. Higher means more acoustic
-variation, not better stress or correct lexical stress. Word length and intonation
-also affect the measure. Recording gain is normalized; low-coverage responses stay
-unavailable. Coverage, features, weights, and caps are returned in JSON. This
-diagnostic never changes trait scores or the 10–90 total.
+Read Aloud audio responses include `skill_analysis` diagnostics. Pronunciation accuracy is marked unavailable because ASR confidence cannot measure phoneme production. Recognition confidence is reported separately; fluency and speed remain uncalibrated pace/pause diagnostics. Stress uses an experimental Praat acoustic variation estimate (see below).
+
+Stress estimation (`acoustic_variation_v1`) uses Praat pitch tracking and Whisper word boundaries. At least four words and 50% of recognized words must have usable timing, recognition confidence >=0.5, and three voiced frames with pitch strength >=0.6. It measures the 10th–90th percentile spreads of median word pitch (semitones), word RMS loudness (dB), and log2 word duration. The displayed percentage is `100 * (0.5 * min(pitch_spread/6, 1) + 0.35 * min(loudness_spread/12, 1) + 0.15 * min(duration_spread/1.5, 1)`. These caps and weights are unvalidated heuristics. Higher means more acoustic variation, not better stress or correct lexical stress. Word length and intonation also affect the measure. Recording gain is normalized; low-coverage responses stay unavailable. Coverage, features, weights, and caps are returned in JSON. This diagnostic never changes the task-point score.
 
 The backend was not present in the supplied workspace, so the integration is a reusable ESM module rather than a patch to your existing server.
 
@@ -171,9 +140,9 @@ You get `questions` with trait scores, word/blank/pair details, and feedback, pl
 
 Weights and targets come from screenshots on slides 3–6 and 29. The deck has inconsistencies: reading weights total 101%, the reorder examples do not consistently match the supplied key, slide 14 calls a written-text example group discussion, and slide 29 has three `<1%` overall weights. We use normalized reading weights, adjacent ordered paragraph pairs, SWT for the written example, and explicitly assume 0.5% for each `<1%` entry. All assumptions are returned in the report. Missing types prevent a complete module score; partial correctness and coverage are separate fields.
 
-Overall is calculated from its own question weights and is never an average of the modules. The 10–90 practice display uses `10 + 0.8 × weighted_correctness`. This is an uncalibrated display mapping, not Pearson's proprietary score conversion. Do not market these numbers as certified PTE predictions without validation on held-out rated attempts. Objective marking includes negative marking with a zero floor, positional blanks, adjacent pairs, and counted dictation words with extras struck and missed words red.
+Overall practice correctness is calculated from its own question weights and is never an average of the modules. No 10–90 score is derived. Objective marking includes negative marking with a zero floor, positional blanks, adjacent pairs, and counted dictation words with extras struck and missed words red.
 
-Writing and extended spoken content use bounded structured JSON judgments from Qwen. Form and zero-content gates are applied server-side. The rubric prompt is a simplified practice rubric, not a full replica of every official descriptor. The small model may score incorrectly even when it produces valid JSON. Writing form checks are approximations; abbreviations, bullet-only writing and unusual sentence boundaries require further linguistic validation.
+Writing and extended spoken content use bounded structured JSON judgments from Qwen 3B, guided by Pearson's public descriptors. Form and zero-content gates are applied server-side. AI trait marks remain unvalidated estimates. Writing form checks are code-based approximations; abbreviations and unusual sentence boundaries require further linguistic validation.
 
 ## Train your own acoustic estimator
 
@@ -205,7 +174,7 @@ Unit tests cover all 22 types with controlled assessor fixtures, score arithmeti
 
 - [faster-whisper (MIT)](https://github.com/SYSTRAN/faster-whisper)
 - [llama-cpp-python (MIT)](https://github.com/abetlen/llama-cpp-python)
-- [Qwen2.5 0.5B GGUF model card](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF)
-- [Pearson score guide](https://www.pearsonpte.com/content/dam/ELL/pte/pearsonpte/resources/PTE-Academic-Test-Taker-Score-Guide.pdf)
+- [Qwen2.5 3B GGUF model card](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF)
+- [Pearson PTE Academic Test Taker Score Guide](https://www.pearsonpte.com/content/dam/ELL/pte/pearsonpte/pdfs/pte-academic-pdfs/PTE-Academic-Test-Taker-Score-Guide.pdf)
 
 The bundled `read-aloud.wav` was generated locally with Windows speech synthesis for a repeatable functional test. Extracted deck images under `spec` are specification evidence, not a training dataset.

@@ -15,19 +15,21 @@ class AudioQuestion(BaseModel):
     allow_proxy_scores: bool = False
 
 def read_aloud_skills(confidence, fluency, pace, wpm, has_speech, enabled):
-    """Audio diagnostics, independent of the 10–90 question score."""
-    available=has_speech and enabled
-    reason='Enable experimental audio scores to view this estimate.' if not enabled else 'No speech detected.'
+    """Expose measurable audio diagnostics without presenting ASR confidence as pronunciation."""
+    available=has_speech
+    reason='No speech detected.'
     def metric(label, value, explanation):
         return {'label':label, 'percent':round(min(100,max(0,value)),1) if available else None,
                 'status':'estimated' if available else 'unavailable',
                 'explanation':explanation if available else reason}
     return {'score_kind':'uncalibrated_audio_diagnostics',
-            'description':'Use these audio estimates to explore your response. They are not compared with other learners and do not add points to your total.',
+            'description':'Audio diagnostics are experimental. Recognition confidence is not pronunciation accuracy, and only trusted acoustic evidence can complete spoken trait points.',
             'metrics':{
-                'pronunciation_accuracy':metric('Pronunciation accuracy',100*confidence,
-                    'Estimated from average word recognition confidence. This is not a phoneme-level pronunciation measurement.'),
-                'fluency':metric('Fluency',20*fluency,
+                'pronunciation_accuracy':{'label':'Pronunciation accuracy','percent':None,'status':'unavailable',
+                    'explanation':'No phoneme-level pronunciation assessor is installed. Speech recognition confidence cannot measure pronunciation.'},
+                'recognition_confidence':metric('Speech recognition confidence',100*confidence,
+                    'How confidently the speech recognizer identified the words; this does not measure pronunciation quality.'),
+                'fluency':metric('Fluency estimate',20*fluency,
                     'Timing estimate combining speaking pace and the proportion of pauses lasting at least 0.5 seconds.'),
                 'stress':{'label':'Stress','percent':None,'status':'unavailable',
                     'explanation':'The current model does not assess syllable or word stress. A dedicated stress assessor is required.'},
@@ -38,7 +40,7 @@ def read_aloud_skills(confidence, fluency, pace, wpm, has_speech, enabled):
 class AudioProcessor:
     def __init__(self):
         self._model=None; self._lock=threading.Lock()
-        self.model_name=os.getenv('PTE_WHISPER_MODEL','tiny.en')
+        self.model_name=os.getenv('PTE_WHISPER_MODEL','base.en')
 
     def process(self,body,assessor=None):
         if body.question.type not in SPOKEN|{'ASQ'}: raise ValueError('Audio response only allowed for speaking questions')
@@ -85,11 +87,10 @@ class AudioProcessor:
         if q.type=='RA':
             result['skill_analysis']=read_aloud_skills(confidence,fluency,pace,wpm,bool(words),body.allow_proxy_scores)
             stress=result['skill_analysis']['metrics']['stress']
-            if body.allow_proxy_scores:
+            if words:
                 result['skill_analysis']['metrics']['stress']=estimate_stress(waveform,words)
             else:
                 stress['label']='Stress (estimate)'
-                stress['explanation']='Enable experimental audio scores to view the stress variation estimate.'
         if body.allow_proxy_scores:
             result['method']='uncalibrated_audio_practice_proxy'
             result['feedback'].append('Audio trait scores and colors are uncalibrated ASR/timing proxies.')

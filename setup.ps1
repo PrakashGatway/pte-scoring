@@ -14,4 +14,4 @@ $script:PtePython = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
 Invoke-PtePython -Arguments @('-m','pip','install','-r','requirements.txt','-r','requirements-test.txt')
 Invoke-PtePython -Arguments @('-m','pip','install','llama-cpp-python==0.3.36','--only-binary=:all:','--extra-index-url','https://abetlen.github.io/llama-cpp-python/whl/cpu')
 if (-not $SkipModelDownload) { Invoke-PtePython -Arguments @('download_models.py') }
-Write-Host 'Setup complete. Run .\run.ps1 and open http://127.0.0.1:8765/'
+Write-Host 'Setup complete. Run .\run.ps1 and open http://127.0.0.1:8000/'

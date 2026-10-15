@@ -11,6 +11,7 @@ TARGETS = {t:86 if t in {'RA','RS','DI','RL','SGD','RTS'} else 95 if t=='SWT' el
 SECTIONS = {t:'Speaking' if t in {'RA','RS','DI','RL','ASQ','SGD','RTS'} else 'Writing' if t in {'WE','SWT'} else 'Reading' if t in {'FIB','FIB_DD','RO','MCM_R','MCS_R'} else 'Listening' for t in TARGETS}
 SPOKEN = {'RA','RS','DI','RL','SGD','RTS'}
 RUBRICS = {
+ 'RA':{'content':5,'pronunciation':5,'oral_fluency':5},
  'DI':{'content':6,'pronunciation':5,'oral_fluency':5},
  'RL':{'content':6,'pronunciation':5,'oral_fluency':5},
  'SGD':{'content':6,'pronunciation':5,'oral_fluency':5},
@@ -18,7 +19,8 @@ RUBRICS = {
  'RS':{'content':3,'pronunciation':5,'oral_fluency':5},
  'SWT':{'content':4,'form':1,'grammar':2,'vocabulary':2},
  'SST':{'content':4,'form':2,'grammar':2,'vocabulary':2,'spelling':2},
- 'WE':{'content':6,'form':2,'development_structure_coherence':6,'grammar':2,'general_linguistic_range':6,'vocabulary':2,'spelling':2}
+ 'WE':{'content':6,'form':2,'development_structure_coherence':6,'grammar':2,'general_linguistic_range':6,'vocabulary_range':2,'spelling':2},
+ 'ASQ':{'vocabulary':1}
 }
 ALIASES = {'pte_reorder':'RO','pte_fill_in_blanks':'FIB','pte_fill_drag':'FIB_DD',
  'pte_mcq_multiple':'MCM_R','pte_mcq_single':'MCS_R',

@@ -22,7 +22,7 @@ const attempt = await client.scoreAttempt({attempt_id:'node-demo', questions:[
   {id:'dictation',type:'WFD',reference:'They have enough work to keep them going.',response:'They have work to keep them going.'}
 ]});
 assert.equal(attempt.report.overall.complete,false);
-assert.equal(attempt.report.overall.practice_score_10_90,null);
+assert.equal(attempt.report.overall.score_kind,'practice_weighted_correctness_not_pearson_score');
 await writeFile(new URL('../examples/attempt-result.json', import.meta.url), JSON.stringify(attempt, null, 2));
 console.log(JSON.stringify({types:types.types.length, negativeMarking:mcq.score, audioTranscript:audio.audio.transcript,
   audioScore:audio.score, audioMax:audio.max_score, status:audio.status, writingScore:writing.score, writingMax:writing.max_score,

@@ -30,7 +30,9 @@ def health():
     return {'status':'ok','llm_enabled':assessor.enabled,'llm_provider':assessor.provider,'llm_loaded':assessor._local is not None,'whisper_model':audio_processor.model_name,'speech_assessor':'local_uncalibrated_proxy_or_external_evidence'}
 
 @app.get('/v1/question-types',dependencies=[Depends(authorize)])
-def question_types(): return {'types':list(TARGETS),'aliases':ALIASES,'weights':WEIGHTS,'targets':TARGETS,'rubrics':RUBRICS}
+def question_types(): return {'types':list(TARGETS),'aliases':ALIASES,'weights':WEIGHTS,'targets':TARGETS,'rubrics':RUBRICS,
+    'scoring_standard':'Pearson PTE Academic published item-level scoring rules where available',
+    'score_limitations':'This service does not reproduce Pearson’s proprietary calibrated 10–90 score engine. Local AI and acoustic marks are estimates; attempt weights and targets are practice assumptions.'}
 
 @app.post('/v1/score-question',dependencies=[Depends(authorize)])
 def question(body: Question): return score_question(body,assessor)

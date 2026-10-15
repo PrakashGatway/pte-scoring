@@ -20,7 +20,7 @@ Extract the ZIP to a writable folder, open PowerShell there, then run:
 .\run.ps1
 ```
 
-Open http://127.0.0.1:8765/ for the upload UI or http://127.0.0.1:8765/docs for API schemas. Do not launch a second process on port 8765 if the service is already running. The setup script automates the installation commands used during development; the full new-machine setup has not been tested on a clean machine.
+Open http://127.0.0.1:8000/ for the upload UI or http://127.0.0.1:8000/docs for API schemas. Do not launch a second process on port 8765 if the service is already running. The setup script automates the installation commands used during development; the full new-machine setup has not been tested on a clean machine.
 
 ## Code map
 
@@ -62,6 +62,6 @@ node node/smoke-test.mjs
 
 Application tests and real inference checks passed. Scoring-quality checks did not all pass: the small Qwen model awarded full marks to an unrelated summary and an instruction-containing response. See `examples/TEST-REPORT.md` and `validation-results.json`. These findings remain unresolved in this handoff.
 
-Pronunciation and fluency are uncalibrated proxies. The 10–90 practice conversion is uncalibrated. This is a functional practice/testing service, not a validated PTE score predictor. No new foundation LLM or trained acoustic model was created. The training script requires real human-rated data and has not been evaluated on such a dataset.
+Question-level points follow public Pearson criteria where available. Attempt weight summaries and all local AI/audio grades are practice estimates. Pearson’s proprietary 10–90 calibration cannot be reproduced. Qwen judgments and ASR/timing proxies need human-rated validation; none has been supplied.
 
 For API payloads, supported types, model-license links and details of deck inconsistencies, read `README.md`.
