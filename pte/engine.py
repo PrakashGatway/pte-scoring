@@ -7,6 +7,20 @@ from .llm import OllamaAssessor, AssessmentUnavailable
 def tokens(text):
     return re.findall(r"[\w]+(?:['’][\w]+)*",text.casefold())
 
+def read_aloud_summary(traits, pending):
+    """Equal normalized trait weights for a practice display, not Pearson calibration."""
+    names=('content','pronunciation','oral_fluency')
+    ratios={name: (min(1,max(0,traits[name]['score']/traits[name]['max']))
+                  if name in traits and traits[name]['max'] else None) for name in names}
+    def scaled(ratio): return int(10+80*ratio+0.5)
+    complete=not pending and all(value is not None for value in ratios.values())
+    return {'score_kind':'uncalibrated_practice_estimate','min_score':10,'max_score':90,
+            'total':scaled(sum(ratios.values())/3) if complete else None,
+            'traits':{name:scaled(value) if value is not None else None for name,value in ratios.items()},
+            'weights':{name:1/3 for name in names},
+            'method':'equal_normalized_traits_v1',
+            'explanation':'Each trait = 10 + 80 × raw score / raw maximum. Total = 10 + 80 × mean of the three normalized traits, rounded once. Practice conversion, not an official Pearson score.'}
+
 def alignment(reference,response):
     a,b=tokens(reference),tokens(response)
     rows=[]; errors=0; matches=0
@@ -112,9 +126,17 @@ def score_question(q,assessor=None):
     maximum=sum(x['max'] for x in traits.values())
     total=sum(x['score'] for x in traits.values())
     correctness=round(100*total/maximum,4) if maximum and not pending else None
-    return {'id':q.id,'type':t,'section':SECTIONS[t],'status':'pending' if pending else 'scored',
+    result={'id':q.id,'type':t,'section':SECTIONS[t],'status':'pending' if pending else 'scored',
        'method':method,'score':round(total,4) if not pending else None,'max_score':sum(maxima.values()) if maxima else maximum,
        'correctness':correctness,'traits':traits,'pending_traits':pending,'details':details,'feedback':feedback}
+    if t=='RA': result['read_aloud_score']=read_aloud_summary(traits,pending)
+    if t in {'SWT','WE'}:
+        result['writing']={'response':q.response,'word_count':len(tokens(q.response)),
+            'guidance':'Write one sentence of 5–75 words.' if t=='SWT' else 'Write an essay of 200–300 words.',
+            'trait_maxima':maxima,'score_kind':'uncalibrated_practice_estimate',
+            'practice_score_10_90':int(10+80*total/maximum+0.5) if maximum and not pending else None,
+            'limitation':'Local AI feedback and marks may be inaccurate. The 10–90 conversion is a practice mapping, not Pearson scoring.'}
+    return result
 
 def build_report(attempt,assessor=None,weights=None):
     results=[score_question(q,assessor) for q in attempt.questions]

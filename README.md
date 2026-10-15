@@ -36,6 +36,65 @@ Use the same service key in Node. Do not expose this inference service directly 
 
 ## Node integration
 
+### Writing in the browser
+
+Choose **Summarize Written Text** or **Write Essay**, enter the source passage or
+essay prompt, and type the student's response. The form shows a live word count
+and sends text to `/v1/score-question`. Results include raw rubric traits, feedback,
+the submitted answer, word count, and `writing.practice_score_10_90` (10 + 80 times
+the raw-score fraction). Missing model assessments stay pending. The local model
+now requests structured, response-specific feedback for these two writing tasks.
+
+The bundled Qwen 0.5B model is **blocked for writing assessment** after it awarded
+full content marks to unrelated and contradictory summaries. Form checks still
+work. Writing now uses the installed Qwen 1.5B model for experimental scores. Override
+its path with `PTE_WRITING_MODEL_PATH`, or configure `PTE_MODEL_PATH` or an Ollama provider,
+then run `python check_writing_quality.py`. This is a small semantic smoke check,
+not a human-rated accuracy benchmark; passing it does not establish 90% accuracy.
+Writing grades and feedback require human validation before learner decisions.
+
+On the supplied bioluminescence example, the tested Qwen 1.5B Q4_K_M candidate
+still gave unsupported grammar criticism and undervalued accurate summaries.
+It passed only four of six final semantic smoke checks. It is enabled for
+experimental writing feedback, not as a validated grader or a 90%-accurate service. See `examples/writing-quality-check.json` for outputs.
+These six developer cases are not an accuracy percentage or a PTE calibration set.
+
+### Read Aloud score display
+
+Read Aloud responses include `read_aloud_score` in the question, audio and attempt APIs.
+Its `total` and `traits` (content, pronunciation, oral_fluency) are integer practice
+scores from 10 to 90. Each trait uses `10 + 80 * raw_score / raw_maximum`.
+The total uses `10 + 80 * mean(content_ratio, pronunciation_ratio, fluency_ratio)`,
+rounded once to the nearest integer. Equal trait weighting is an explicit practice
+assumption, not Pearson's proprietary score conversion. Normalization prevents
+longer reference passages from increasing content's share of the displayed total.
+For example, content 3/4, pronunciation 2.5/5 and fluency 5/5 display 70, 50 and
+90, with a total of 70/90. Existing zero-content/no-response gates produce 10/90.
+Missing acoustic evidence leaves the total and missing traits null (Pending).
+The existing raw `score`, `max_score`, `traits`, and report calculations are retained.
+The browser displays this summary for Read Aloud; other question types retain raw points.
+
+Read Aloud audio responses also include `skill_analysis`, shown as a separate card
+with percentage bars and expandable explanations. Pronunciation accuracy uses mean
+ASR confidence; fluency uses the existing pace/pause estimate; speed shows pace fit
+(100% at 100–230 words/min, reduced outside that range). These are uncalibrated
+diagnostics, not learner percentiles or additional total-score components. Stress
+uses an experimental Praat acoustic variation estimate (see below). With no
+detected speech or experimental scores disabled, percentages are null and the UI
+shows N/A. Each metric includes its status and explanation in downloaded JSON.
+
+Stress estimation (`acoustic_variation_v1`) uses Praat pitch tracking and Whisper
+word boundaries. At least four words and 50% of recognized words must have usable
+timing, recognition confidence >=0.5, and three voiced frames with pitch strength
+>=0.6. It measures the 10th–90th percentile spreads of median word pitch (semitones),
+word RMS loudness (dB), and log2 word duration. The displayed percentage is
+`100 * (0.5 * min(pitch_spread/6, 1) + 0.35 * min(loudness_spread/12, 1) + 0.15 * min(duration_spread/1.5, 1))`.
+These caps and weights are unvalidated heuristics. Higher means more acoustic
+variation, not better stress or correct lexical stress. Word length and intonation
+also affect the measure. Recording gain is normalized; low-coverage responses stay
+unavailable. Coverage, features, weights, and caps are returned in JSON. This
+diagnostic never changes trait scores or the 10–90 total.
+
 The backend was not present in the supplied workspace, so the integration is a reusable ESM module rather than a patch to your existing server.
 
 ```javascript

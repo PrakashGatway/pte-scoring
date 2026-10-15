@@ -3,4 +3,5 @@ uvicorn==0.54.0
 pydantic==2.14.1
 faster-whisper==1.2.1
 numpy==2.2.6
+praat-parselmouth==0.4.7
 # Install llama-cpp-python separately using the CPU wheel index in README.md.

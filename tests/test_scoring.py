@@ -41,9 +41,79 @@ def test_repeat_sentence_partial():
     r=score_question(q('RS',reference='they have enough work to keep them going',response='they have enough work'))
     assert r['traits']['content']['score']==2
 
+@pytest.mark.parametrize('response,pronunciation,fluency,expected',[
+    ('the cat sat here',5,5,90),
+    ('the cat sat here',0,0,37),
+    ('the cat sat here',5,0,63),
+    ('the cat sat',2.5,5,70),
+    ('unrelated words',5,5,10),
+    ('',5,5,10),
+])
+def test_read_aloud_practice_total(response,pronunciation,fluency,expected):
+    r=score_question(q('RA',reference='the cat sat here',response=response,
+        speech={'source':'test_fixture','pronunciation':pronunciation,'oral_fluency':fluency}))
+    summary=r['read_aloud_score']
+    assert summary['total']==expected
+    assert all(10<=value<=90 for value in summary['traits'].values())
+    assert summary['score_kind']=='uncalibrated_practice_estimate'
+
+def test_read_aloud_pending_display():
+    r=score_question(q('RA',reference='the cat sat',response='the cat sat'))
+    assert r['read_aloud_score']['total'] is None
+    assert r['read_aloud_score']['traits']=={'content':90,'pronunciation':None,'oral_fluency':None}
+
+def test_other_types_keep_raw_scores():
+    r=score_question(q('WFD',reference='the cat',response='the cat'))
+    assert 'read_aloud_score' not in r
+    assert r['score']==r['max_score']==2
+
+def test_read_aloud_summary_in_api_and_attempt():
+    payload={'id':'ra','type':'RA','reference':'the cat sat here','response':'the cat sat',
+             'speech':{'source':'test_fixture','pronunciation':2.5,'oral_fluency':5}}
+    client=TestClient(app)
+    response=client.post('/v1/score-question',json=payload)
+    assert response.status_code==200
+    assert response.json()['read_aloud_score']['total']==70
+    attempt=client.post('/v1/score-attempt',json={'attempt_id':'a','questions':[payload]})
+    assert attempt.json()['questions'][0]['read_aloud_score']['total']==70
+
 def test_invalid_form_no_llm():
     r=score_question(q('WE',prompt='Discuss education',response='too short'),NoLLM())
     assert r['score']==0 and r['status']=='scored'
+
+@pytest.mark.parametrize('kind,context',[('SWT',{'reference':'Libraries help people learn.'}),('WE',{'prompt':'Discuss education.'})])
+def test_writing_metadata_and_pending(kind,context):
+    text='Libraries help people learn by providing free books and quiet study spaces.' if kind=='SWT' else ' '.join(['Education helps communities to develop useful skills.']*30)
+    r=score_question(q(kind,response=text,**context),NoLLM())
+    assert r['writing']['response']==text
+    assert r['writing']['word_count']>0
+    assert r['writing']['practice_score_10_90'] is None
+    assert r['pending_traits'] and r['status']=='pending'
+    full=score_question(q(kind,response=text,**context),FullLLM())
+    assert full['writing']['practice_score_10_90']==90
+    assert 'audio' not in full
+
+def test_writing_empty_and_invalid_form():
+    for response in ['', 'Too short.', 'One sentence is here. Another sentence is also here.']:
+        r=score_question(q('SWT',reference='Libraries support education.',response=response),NoLLM())
+        assert r['writing']['practice_score_10_90']==10
+
+def test_writing_zero_content_gate():
+    class Irrelevant:
+        def assess(self,q,traits): return {'traits':{k:0 if k=='content' else v for k,v in traits.items()},'feedback':['Unrelated to the source.']}
+    r=score_question(q('SWT',reference='Libraries provide books.',response='Bananas are delicious and football is a popular sport.'),Irrelevant())
+    assert r['writing']['practice_score_10_90']==10
+    assert all(trait['score']==0 for trait in r['traits'].values())
+
+def test_bundled_model_cannot_award_misleading_writing_scores(monkeypatch):
+    from pte.llm import LocalAssessor
+    monkeypatch.setenv('PTE_MODEL_PATH','models/qwen/qwen2.5-0.5b-instruct-q5_k_m.gguf')
+    monkeypatch.delenv('PTE_WRITING_MODEL_PATH',raising=False)
+    monkeypatch.setenv('PTE_LLM_PROVIDER','llama_cpp')
+    r=score_question(q('SWT',reference='Libraries provide books.',response='Bananas are delicious and football is a popular sport.'),LocalAssessor())
+    assert r['status']=='pending'
+    assert r['writing']['practice_score_10_90'] is None
+    assert 'failed relevance checks' in ' '.join(r['feedback'])
 
 def test_llm_unavailable_not_fake_score():
     r=score_question(q('DI',prompt='A chart of rising sales',response='The sales increase.'),NoLLM())
@@ -106,3 +176,20 @@ def test_silent_audio_no_hallucination():
 def test_invalid_audio():
     client=TestClient(app)
     assert client.post('/v1/score-audio',json={'question':{'id':'a','type':'RA','reference':'Hi'},'audio_base64':'invalid!'}).status_code==422
+
+def test_read_aloud_skill_diagnostics():
+    from pte.audio import read_aloud_skills
+    metrics=read_aloud_skills(.98,4.4,.9,250,True,True)['metrics']
+    assert metrics['pronunciation_accuracy']['percent']==98
+    assert metrics['fluency']['percent']==88
+    assert metrics['speed']['percent']==90
+    assert metrics['speed']['words_per_minute']==250
+    assert metrics['stress']['percent'] is None
+    assert metrics['stress']['status']=='unavailable'
+
+@pytest.mark.parametrize('has_speech,enabled',[(False,True),(True,False),(False,False)])
+def test_skill_diagnostics_require_speech_and_opt_in(has_speech,enabled):
+    from pte.audio import read_aloud_skills
+    metrics=read_aloud_skills(.98,4.4,.9,250,has_speech,enabled)['metrics']
+    assert all(m['percent'] is None for m in metrics.values())
+    assert all(m['status']=='unavailable' for m in metrics.values())

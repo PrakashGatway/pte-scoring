@@ -6,12 +6,34 @@ from pydantic import BaseModel, ConfigDict, Field
 from .models import Question, SpeechEvidence, SpeechWord
 from .config import SPOKEN
 from .engine import score_question
+from .stress import estimate_stress
 
 class AudioQuestion(BaseModel):
     model_config=ConfigDict(extra='forbid')
     question: Question
     audio_base64: str = Field(min_length=1,max_length=14000000)
     allow_proxy_scores: bool = False
+
+def read_aloud_skills(confidence, fluency, pace, wpm, has_speech, enabled):
+    """Audio diagnostics, independent of the 10–90 question score."""
+    available=has_speech and enabled
+    reason='Enable experimental audio scores to view this estimate.' if not enabled else 'No speech detected.'
+    def metric(label, value, explanation):
+        return {'label':label, 'percent':round(min(100,max(0,value)),1) if available else None,
+                'status':'estimated' if available else 'unavailable',
+                'explanation':explanation if available else reason}
+    return {'score_kind':'uncalibrated_audio_diagnostics',
+            'description':'Use these audio estimates to explore your response. They are not compared with other learners and do not add points to your total.',
+            'metrics':{
+                'pronunciation_accuracy':metric('Pronunciation accuracy',100*confidence,
+                    'Estimated from average word recognition confidence. This is not a phoneme-level pronunciation measurement.'),
+                'fluency':metric('Fluency',20*fluency,
+                    'Timing estimate combining speaking pace and the proportion of pauses lasting at least 0.5 seconds.'),
+                'stress':{'label':'Stress','percent':None,'status':'unavailable',
+                    'explanation':'The current model does not assess syllable or word stress. A dedicated stress assessor is required.'},
+                'speed':{**metric('Speed',100*pace,
+                    'Pace fit: 100% at 100–230 words/min, reduced outside that range. This is a practice heuristic, not a Pearson target.'),
+                    'words_per_minute':round(wpm,2) if has_speech else None}}}
 
 class AudioProcessor:
     def __init__(self):
@@ -60,6 +82,14 @@ class AudioProcessor:
             'model':self.model_name,'proxy_scores_used':body.allow_proxy_scores,
             'words':[{'word':w.word.strip(),'start':w.start,'end':w.end,'recognition_confidence':w.probability} for w in words],
             'limitation':'Recognition confidence is not a pronunciation measurement; timing fluency and proxy scores need validation with human-rated recordings.'}
+        if q.type=='RA':
+            result['skill_analysis']=read_aloud_skills(confidence,fluency,pace,wpm,bool(words),body.allow_proxy_scores)
+            stress=result['skill_analysis']['metrics']['stress']
+            if body.allow_proxy_scores:
+                result['skill_analysis']['metrics']['stress']=estimate_stress(waveform,words)
+            else:
+                stress['label']='Stress (estimate)'
+                stress['explanation']='Enable experimental audio scores to view the stress variation estimate.'
         if body.allow_proxy_scores:
             result['method']='uncalibrated_audio_practice_proxy'
             result['feedback'].append('Audio trait scores and colors are uncalibrated ASR/timing proxies.')
