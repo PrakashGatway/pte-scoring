@@ -11,7 +11,7 @@ from .stress import estimate_stress
 class AudioQuestion(BaseModel):
     model_config=ConfigDict(extra='forbid')
     question: Question
-    audio_base64: str = Field(min_length=1,max_length=14000000)
+    audio_base64: str = Field(min_length=0,max_length=14000000)
     allow_proxy_scores: bool = False
 
 def read_aloud_skills(confidence, fluency, pace, wpm, has_speech, enabled):
@@ -52,7 +52,7 @@ class AudioProcessor:
         try: waveform=decode_audio(io.BytesIO(data),sampling_rate=16000)
         except Exception as e: raise ValueError('Cannot decode audio') from e
         duration=len(waveform)/16000
-        if not 0.25<=duration<=240: raise ValueError('Audio duration must be 0.25–240 seconds')
+        if not 0.01<=duration<=300: raise ValueError('Audio duration must be 0.25–240 seconds')
         # Silence is checked before inference to avoid hallucinated silent transcripts.
         rms=float(np.sqrt(np.mean(waveform**2)))
         if rms<0.001:

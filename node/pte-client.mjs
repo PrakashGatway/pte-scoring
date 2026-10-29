@@ -18,5 +18,9 @@ export class PteClient {
     return this.request('/v1/score-audio', { question, audio_base64: audioBuffer.toString('base64'), allow_proxy_scores: allowProxyScores });
   }
   scoreAttempt(attempt) { return this.request('/v1/score-attempt', attempt); }
+  scoreGreEssay({ prompt, response, instructions = '' }) {
+    return this.request('/v1/gre/analytical-writing', { prompt, response, instructions });
+  }
+  chat(message, history = [], prompt = '') { return this.request('/v1/chat', { message, history, prompt }); }
   questionTypes() { return this.request('/v1/question-types'); }
 }

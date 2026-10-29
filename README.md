@@ -94,6 +94,10 @@ The Express mounting helper is `node/express-route.mjs`. Its `loadAttempt` callb
 | POST /v1/score-question | Score a response/transcript with an answer key or local LLM |
 | POST /v1/score-audio | Transcribe a speaking recording and score its response |
 | POST /v1/score-attempt | Generate all module analysis rows and independent overall analysis |
+| POST /v1/gre/analytical-writing | Estimate a GRE Analyze an Issue essay score (0–6, half-point steps) |
+| POST /v1/chat | Answer a basic question with the configured local LLM |
+
+The GRE essay route is separate from PTE attempt totals. Send `{ "prompt": "...", "instructions": "...", "response": "..." }` to `/v1/gre/analytical-writing`. The score is a local practice estimate, mapped from the model's doubled integer rubric onto the published 0–6 half-point scale; an empty response returns `no_score`. The `/v1/chat` route identifies itself as Ooshas AI and accepts `{ "message": "...", "prompt": "...optional student details...", "history": [{ "role": "user", "content": "..." }] }`. Use `prompt` to pass relevant learner context such as exam, target score, test date, or study level. History is optional and limited to 20 turns. Both routes use the same configured local model and service-key authentication as the PTE endpoints. In Node, `PteClient` provides `scoreGreEssay({ prompt, instructions, response })` and `chat(message, history, prompt)`.
 
 | Type | Question | Response/key |
 |---|---|---|

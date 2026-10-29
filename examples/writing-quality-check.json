@@ -1,34 +1,35 @@
 {
+  "model": "default",
   "note": "Six developer smoke cases, not a human-rated accuracy benchmark.",
   "cases": [
     {
       "case": "relevant",
       "passed": false,
-      "seconds": 38.17,
+      "seconds": 31.38,
       "result": {
         "id": "relevant",
         "type": "SWT",
         "section": "Writing",
         "status": "scored",
-        "method": "practice_rubric",
-        "score": 6,
+        "method": "published_item_rubric_with_local_ai_estimates",
+        "score": 0,
         "max_score": 9,
-        "correctness": 66.6667,
+        "correctness": 0.0,
         "traits": {
           "form": {
-            "score": 1,
+            "score": 0,
             "max": 1
           },
           "content": {
-            "score": 2,
+            "score": 0,
             "max": 4
           },
           "grammar": {
-            "score": 1,
+            "score": 0,
             "max": 2
           },
           "vocabulary": {
-            "score": 2,
+            "score": 0,
             "max": 2
           }
         },
@@ -37,9 +38,8 @@
           "word_count": 41
         },
         "feedback": [
-          "The response accurately covers the main message and key relationships about bioluminescence, but it lacks detailed explanations and specific examples.",
-          "The grammar is mostly correct, but there are a few minor errors that affect the overall clarity.",
-          "The vocabulary is appropriate and accurately conveys the meaning, but it could be more varied to provide a more comprehensive understanding."
+          "The local model returned incomplete feedback. Review the trait points against the published rubric.",
+          "Content is zero. The response receives no points."
         ],
         "writing": {
           "response": "Bioluminescence is the natural ability of certain animals to produce light, which helps them attract mates, communicate, defend against predators, and survive in deep oceans, while scientific research on this phenomenon has also contributed to advancements in medicine, genetics, and biotechnology.",
@@ -51,22 +51,21 @@
             "grammar": 2,
             "vocabulary": 2
           },
-          "score_kind": "uncalibrated_practice_estimate",
-          "practice_score_10_90": 63,
-          "limitation": "Local AI feedback and marks may be inaccurate. The 10\u201390 conversion is a practice mapping, not Pearson scoring."
+          "score_kind": "practice_estimate_using_published_rubric",
+          "limitation": "Raw trait points follow Pearson\u2019s published task rubric. This local AI estimate is not a calibrated Pearson score."
         }
       }
     },
     {
       "case": "unrelated",
       "passed": true,
-      "seconds": 17.55,
+      "seconds": 14.48,
       "result": {
         "id": "unrelated",
         "type": "SWT",
         "section": "Writing",
         "status": "scored",
-        "method": "practice_rubric",
+        "method": "published_item_rubric_with_local_ai_estimates",
         "score": 0,
         "max_score": 9,
         "correctness": 0.0,
@@ -93,7 +92,7 @@
           "word_count": 16
         },
         "feedback": [
-          "The response does not match the source. The source discusses bioluminescence and its applications, while the response talks about football and bananas, which are unrelated topics.",
+          "The local model returned incomplete feedback. Review the trait points against the published rubric.",
           "Content is zero. The response receives no points."
         ],
         "writing": {
@@ -106,22 +105,21 @@
             "grammar": 2,
             "vocabulary": 2
           },
-          "score_kind": "uncalibrated_practice_estimate",
-          "practice_score_10_90": 10,
-          "limitation": "Local AI feedback and marks may be inaccurate. The 10\u201390 conversion is a practice mapping, not Pearson scoring."
+          "score_kind": "practice_estimate_using_published_rubric",
+          "limitation": "Raw trait points follow Pearson\u2019s published task rubric. This local AI estimate is not a calibrated Pearson score."
         }
       }
     },
     {
       "case": "contradiction",
       "passed": true,
-      "seconds": 30.62,
+      "seconds": 13.03,
       "result": {
         "id": "contradiction",
         "type": "SWT",
         "section": "Writing",
         "status": "scored",
-        "method": "practice_rubric",
+        "method": "published_item_rubric_with_local_ai_estimates",
         "score": 0,
         "max_score": 9,
         "correctness": 0.0,
@@ -148,8 +146,7 @@
           "word_count": 12
         },
         "feedback": [
-          "The response contradicts the provided prompt and reference. It does not provide any relevant information about libraries and their role in supporting students and communities. Instead, it makes false claims about libraries not providing books or thes",
-          "The response is entirely irrelevant and does not address the central message of the prompt and reference. It also contains factual errors, such as claiming that libraries prevent students from learning, which is not accurate.",
+          "The local model returned incomplete feedback. Review the trait points against the published rubric.",
           "Content is zero. The response receives no points."
         ],
         "writing": {
@@ -162,22 +159,21 @@
             "grammar": 2,
             "vocabulary": 2
           },
-          "score_kind": "uncalibrated_practice_estimate",
-          "practice_score_10_90": 10,
-          "limitation": "Local AI feedback and marks may be inaccurate. The 10\u201390 conversion is a practice mapping, not Pearson scoring."
+          "score_kind": "practice_estimate_using_published_rubric",
+          "limitation": "Raw trait points follow Pearson\u2019s published task rubric. This local AI estimate is not a calibrated Pearson score."
         }
       }
     },
     {
       "case": "paraphrase",
       "passed": false,
-      "seconds": 16.31,
+      "seconds": 21.67,
       "result": {
         "id": "paraphrase",
         "type": "SWT",
         "section": "Writing",
         "status": "scored",
-        "method": "practice_rubric",
+        "method": "published_item_rubric_with_local_ai_estimates",
         "score": 6,
         "max_score": 9,
         "correctness": 66.6667,
@@ -204,7 +200,7 @@
           "word_count": 15
         },
         "feedback": [
-          "The response accurately covers the main message of the source, which is that exercise improves cardiovascular health and reduces the risk of disease, while adequate rest supports recovery. However, the response is not fully developed as it does not ("
+          "The local model returned incomplete feedback. Review the trait points against the published rubric."
         ],
         "writing": {
           "response": "Exercise protects the heart and lowers illness risk, while sufficient sleep helps the body recover.",
@@ -216,25 +212,24 @@
             "grammar": 2,
             "vocabulary": 2
           },
-          "score_kind": "uncalibrated_practice_estimate",
-          "practice_score_10_90": 63,
-          "limitation": "Local AI feedback and marks may be inaccurate. The 10\u201390 conversion is a practice mapping, not Pearson scoring."
+          "score_kind": "practice_estimate_using_published_rubric",
+          "limitation": "Raw trait points follow Pearson\u2019s published task rubric. This local AI estimate is not a calibrated Pearson score."
         }
       }
     },
     {
       "case": "essay_relevant",
       "passed": true,
-      "seconds": 21.25,
+      "seconds": 23.14,
       "result": {
         "id": "essay_relevant",
         "type": "WE",
         "section": "Writing",
         "status": "scored",
-        "method": "practice_rubric",
-        "score": 16,
+        "method": "published_item_rubric_with_local_ai_estimates",
+        "score": 15,
         "max_score": 26,
-        "correctness": 61.5385,
+        "correctness": 57.6923,
         "traits": {
           "form": {
             "score": 2,
@@ -256,8 +251,8 @@
             "score": 2,
             "max": 6
           },
-          "vocabulary": {
-            "score": 2,
+          "vocabulary_range": {
+            "score": 1,
             "max": 2
           },
           "spelling": {
@@ -270,7 +265,7 @@
           "word_count": 216
         },
         "feedback": [
-          "Your response effectively addresses the question by discussing the importance of public libraries in the digital age. You provide specific examples of how libraries support education and offer practical support to residents. Your structure is clear, "
+          "The local model returned incomplete feedback. Review the trait points against the published rubric."
         ],
         "writing": {
           "response": "Public libraries deserve continued public funding because they provide educational opportunities that many residents cannot afford privately. Although digital services have changed how people find information, they have not removed the need for shared learning spaces. First, libraries make books and reliable online resources available without charging each visitor. Students from households with limited incomes can study, borrow materials and complete assignments using public computers. For example, a student who lacks a quiet room or internet access at home can prepare for examinations in a library. These services reduce practical barriers to learning. Second, trained librarians help people find trustworthy information and develop useful digital skills. Workshops can support older adults who need assistance with online forms and job seekers who are preparing applications. This support has value beyond the simple availability of books. Critics argue that maintaining library buildings is expensive and that online subscriptions could replace them. That concern should encourage careful budgeting, but an online service cannot provide a safe study space or personal guidance to every resident. Local authorities should therefore assess community needs and combine physical facilities with digital collections. In conclusion, funding public libraries is justified because they widen access to education and offer practical support. Modernizing their services is a better response to technological change than withdrawing public investment.",
@@ -282,25 +277,24 @@
             "development_structure_coherence": 6,
             "grammar": 2,
             "general_linguistic_range": 6,
-            "vocabulary": 2,
+            "vocabulary_range": 2,
             "spelling": 2
           },
-          "score_kind": "uncalibrated_practice_estimate",
-          "practice_score_10_90": 59,
-          "limitation": "Local AI feedback and marks may be inaccurate. The 10\u201390 conversion is a practice mapping, not Pearson scoring."
+          "score_kind": "practice_estimate_using_published_rubric",
+          "limitation": "Raw trait points follow Pearson\u2019s published task rubric. This local AI estimate is not a calibrated Pearson score."
         }
       }
     },
     {
       "case": "essay_unrelated",
       "passed": true,
-      "seconds": 24.44,
+      "seconds": 22.89,
       "result": {
         "id": "essay_unrelated",
         "type": "WE",
         "section": "Writing",
         "status": "scored",
-        "method": "practice_rubric",
+        "method": "published_item_rubric_with_local_ai_estimates",
         "score": 0,
         "max_score": 26,
         "correctness": 0.0,
@@ -325,7 +319,7 @@
             "score": 0,
             "max": 6
           },
-          "vocabulary": {
+          "vocabulary_range": {
             "score": 0,
             "max": 2
           },
@@ -339,7 +333,7 @@
           "word_count": 216
         },
         "feedback": [
-          "The response is irrelevant and does not address the prompt at all. It contains random information about bananas and football, which has no relation to the question about funding public libraries in the digital age. There are no logical connections or",
+          "The local model returned incomplete feedback. Review the trait points against the published rubric.",
           "Content is zero. The response receives no points."
         ],
         "writing": {
@@ -352,15 +346,13 @@
             "development_structure_coherence": 6,
             "grammar": 2,
             "general_linguistic_range": 6,
-            "vocabulary": 2,
+            "vocabulary_range": 2,
             "spelling": 2
           },
-          "score_kind": "uncalibrated_practice_estimate",
-          "practice_score_10_90": 10,
-          "limitation": "Local AI feedback and marks may be inaccurate. The 10\u201390 conversion is a practice mapping, not Pearson scoring."
+          "score_kind": "practice_estimate_using_published_rubric",
+          "limitation": "Raw trait points follow Pearson\u2019s published task rubric. This local AI estimate is not a calibrated Pearson score."
         }
       }
     }
-  ],
-  "model": "qwen2.5-1.5b-instruct-q4_k_m.gguf"
+  ]
 }

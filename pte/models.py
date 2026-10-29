@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 from .config import ALIASES, TARGETS, SPOKEN
 
@@ -73,3 +74,20 @@ class Attempt(BaseModel):
         if len({q.id for q in self.questions})!=len(self.questions): raise ValueError('Question IDs must be unique')
         if any(k not in TARGETS or not 0<=v<=100 for k,v in self.targets.items()): raise ValueError('Targets must use canonical types and percentages 0–100')
         return self
+
+class GREAnalyticalWritingRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    prompt: str = Field(min_length=1,max_length=10000)
+    response: str = Field(max_length=50000)
+    instructions: str = Field(default='',max_length=5000)
+
+class ChatTurn(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    role: Literal['user','assistant']
+    content: str = Field(min_length=1,max_length=10000)
+
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    message: str = Field(min_length=1,max_length=10000)
+    prompt: str = Field(default='',max_length=10000)
+    history: list[ChatTurn] = Field(default_factory=list,max_length=20)

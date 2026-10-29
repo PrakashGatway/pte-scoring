@@ -193,6 +193,38 @@ def test_api_auth_validation(monkeypatch):
     assert client.post('/v1/score-question',json={'id':'a','type':'bad'}).status_code==401
     assert client.post('/v1/score-question',headers={'X-Service-Key':'test-secret'},json={'id':'a','type':'bad'}).status_code==422
 
+def test_gre_analytical_writing_endpoint_returns_half_point_score(monkeypatch):
+    from pte.api import assessor
+    monkeypatch.setattr(assessor,'assess',lambda question,traits:{'traits':{'overall_quality':9},'feedback':['Your position is clear and supported with relevant examples.']})
+    response=TestClient(app).post('/v1/gre/analytical-writing',json={
+        'prompt':'Universities should require students to take courses outside their fields.',
+        'instructions':'Write an essay discussing the extent to which you agree.',
+        'response':'I partly agree because interdisciplinary courses broaden perspectives.'})
+    assert response.status_code==200
+    assert response.json()['score']==4.5
+    assert response.json()['max_score']==6
+    assert response.json()['question_type']=='GRE Analyze an Issue'
+
+def test_gre_blank_response_is_no_score():
+    response=TestClient(app).post('/v1/gre/analytical-writing',json={'prompt':'Discuss this claim.','response':' '})
+    assert response.status_code==200
+    assert response.json()['status']=='no_score'
+    assert response.json()['score'] is None
+
+def test_chat_endpoint_uses_configured_assessor(monkeypatch):
+    from pte.api import assessor
+    seen={}
+    def fake_chat(message,history,prompt):
+        seen.update(message=message,history=history,prompt=prompt)
+        return 'The answer is 42.'
+    monkeypatch.setattr(assessor,'chat',fake_chat)
+    response=TestClient(app).post('/v1/chat',json={
+        'message':'Create a study plan.','prompt':'Exam: IELTS; target band: 7; test date: December.',
+        'history':[{'role':'user','content':'Question'}]})
+    assert response.status_code==200
+    assert response.json()['answer']=='The answer is 42.'
+    assert seen['prompt']=='Exam: IELTS; target band: 7; test date: December.'
+
 def test_silent_audio_no_hallucination():
     client=TestClient(app); stream=io.BytesIO()
     with wave.open(stream,'wb') as w:
