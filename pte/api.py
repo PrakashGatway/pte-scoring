@@ -2,6 +2,7 @@ import os, secrets
 from pathlib import Path
 from types import SimpleNamespace
 from fastapi import FastAPI, Depends, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from .models import Attempt, Question, GREAnalyticalWritingRequest, ChatRequest
@@ -11,6 +12,12 @@ from .llm import OllamaAssessor
 from .audio import AudioQuestion, AudioProcessor
 
 app=FastAPI(title='PTE practice scoring service',version='1.0.0')
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 root=Path(__file__).resolve().parents[1]
 app.mount('/ui',StaticFiles(directory=root/'ui'),name='ui')
 assessor=OllamaAssessor()
