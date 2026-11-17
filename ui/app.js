@@ -24,11 +24,11 @@ const labels = {
   SMW: ['Listening transcript and question', 'Paste the transcript with the missing word…', 'Enter the correct option ID and the option you selected.'],
   HIW: ['Transcript and question', 'Paste the transcript…', 'Use the word IDs from the options list; correct selections earn points and incorrect selections lose points.']
 };
-const AUDIO_TYPES = new Set(['RA','RS','DI','RL','SGD','RTS','ASQ']);
-const TEXT_TYPES = new Set(['SWT','WE','SST','WFD']);
-const STRUCTURED_TYPES = new Set(['ASQ','FIB','FIB_DD','FIB_L','RO','MCM_R','MCM_L','MCS_R','MCS_L','HCS','SMW','HIW']);
-const ARRAY_TYPES = new Set(['FIB','FIB_DD','FIB_L','RO','MCM_R','MCM_L','HIW']);
-const OPTION_TYPES = new Set(['MCM_R','MCM_L','MCS_R','MCS_L','HCS','SMW','HIW']);
+const AUDIO_TYPES = new Set(['RA', 'RS', 'DI', 'RL', 'SGD', 'RTS', 'ASQ']);
+const TEXT_TYPES = new Set(['SWT', 'WE', 'SST', 'WFD']);
+const STRUCTURED_TYPES = new Set(['ASQ', 'FIB', 'FIB_DD', 'FIB_L', 'RO', 'MCM_R', 'MCM_L', 'MCS_R', 'MCS_L', 'HCS', 'SMW', 'HIW']);
+const ARRAY_TYPES = new Set(['FIB', 'FIB_DD', 'FIB_L', 'RO', 'MCM_R', 'MCM_L', 'HIW']);
+const OPTION_TYPES = new Set(['MCM_R', 'MCM_L', 'MCS_R', 'MCS_L', 'HCS', 'SMW', 'HIW']);
 function status(message, error = false) { $('status').textContent = message; $('status').className = error ? 'error' : ''; }
 function setRecording(file) {
   if (busy) return;
@@ -45,11 +45,11 @@ function setRecording(file) {
 function updateType() {
   const [label, placeholder, help] = labels[$('type').value];
   $('context-label').textContent = label; $('context').placeholder = placeholder; $('context-help').textContent = help;
-  const type=$('type').value, audio=AUDIO_TYPES.has(type), typed=TEXT_TYPES.has(type), structured=STRUCTURED_TYPES.has(type);
+  const type = $('type').value, audio = AUDIO_TYPES.has(type), typed = TEXT_TYPES.has(type), structured = STRUCTURED_TYPES.has(type);
   $('context').required = true;
   $('audio-input').hidden = !audio; $('proxy-option').hidden = !audio; $('writing-input').hidden = !typed; $('structured-input').hidden = !structured;
-  $('writing-answer').required = typed; $('answer-key').required = structured; $('student-answer').required = structured && type!=='ASQ';
-  $('student-answer-input').hidden = type==='ASQ'; $('options-input').hidden = !OPTION_TYPES.has(type);
+  $('writing-answer').required = typed; $('answer-key').required = structured; $('student-answer').required = structured && type !== 'ASQ';
+  $('student-answer-input').hidden = type === 'ASQ'; $('options-input').hidden = !OPTION_TYPES.has(type);
   $('structured-guidance').textContent = structured ? help : '';
   $('input-heading').textContent = audio ? 'Your recording' : structured ? 'Your answer' : 'Your writing';
   $('submit').textContent = audio ? 'Analyze recording ↗' : structured ? 'Check answer ↗' : 'Analyze writing ↗';
@@ -87,8 +87,8 @@ function render(data) {
   lastResult = data; $('empty').hidden = true; $('results').hidden = false; $('download').hidden = false;
   $('result-state').className = 'result-state' + (data.status === 'pending' ? ' pending' : '');
   const writingData = data.writing;
-  const writing = ['SWT','WE','SST'].includes(data.type);
-  const semantic = ['DI','RL','SGD','RTS','SWT','WE','SST'].includes(data.type);
+  const writing = ['SWT', 'WE', 'SST'].includes(data.type);
+  const semantic = ['DI', 'RL', 'SGD', 'RTS', 'SWT', 'WE', 'SST'].includes(data.type);
   $('result-state').textContent = data.status === 'pending' ? `Partial result · pending: ${data.pending_traits.join(', ').replaceAll('_', ' ')}` : data.type === 'RA' ? 'Read Aloud · normalized 0–5 practice scale' : semantic ? (data.traits.form?.score === 0 ? 'Form check complete · response outside writing requirements' : 'Published rubric · local AI estimate') : data.audio?.proxy_scores_used ? 'Published rubric · experimental audio estimates' : 'Published item scoring rules';
   $('score-label').textContent = data.type === 'RA' ? 'Read Aloud practice score' : 'Question points';
   $('score').textContent = data.score == null ? 'Pending' : `${data.score} / ${data.max_score}`;
@@ -109,7 +109,7 @@ function render(data) {
   $('correctness-label').textContent = 'Rubric points %';
   $('correctness').textContent = data.correctness == null ? '—' : `${data.correctness.toFixed(1)}%`;
   $('length-label').textContent = textAnswer ? 'Word count' : hasAudio ? 'Audio length' : 'Answer';
-  const responseWords=typeof data.response==='string' ? (data.response.match(/[\p{L}\p{N}_]+(?:['’][\p{L}\p{N}_]+)*/gu)||[]).length : 0;
+  const responseWords = typeof data.response === 'string' ? (data.response.match(/[\p{L}\p{N}_]+(?:['’][\p{L}\p{N}_]+)*/gu) || []).length : 0;
   $('duration').textContent = writing && writingData ? writingData.word_count : textAnswer ? (data.details.word_count ?? responseWords) : hasAudio ? `${data.audio.duration_seconds.toFixed(1)}s` : '—';
   $('response-heading').textContent = hasAudio ? 'Transcript' : 'Your answer';
   const submitted = hasAudio ? data.audio.transcript : data.response;
@@ -170,29 +170,29 @@ function render(data) {
 }
 $('form').addEventListener('submit', async e => {
   e.preventDefault(); if (busy) return;
-  const type=$('type').value, audio=AUDIO_TYPES.has(type), typed=TEXT_TYPES.has(type), structured=STRUCTURED_TYPES.has(type);
+  const type = $('type').value, audio = AUDIO_TYPES.has(type), typed = TEXT_TYPES.has(type), structured = STRUCTURED_TYPES.has(type);
   if (audio && !recording) { status('Choose a recording or try the sample audio first.', true); return; }
   if (typed && !$('writing-answer').value.trim()) { status('Enter your answer first.', true); return; }
-  const keyLines=$('answer-key').value.split('\n').map(x=>x.trim()).filter(Boolean);
-  const responseLines=$('student-answer').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  const keyLines = $('answer-key').value.split('\n').map(x => x.trim()).filter(Boolean);
+  const responseLines = $('student-answer').value.split('\n').map(x => x.trim()).filter(Boolean);
   if (structured && !keyLines.length) { status('Enter the answer key first.', true); return; }
-  if (structured && type!=='ASQ' && !responseLines.length) { status('Enter your answer first.', true); return; }
+  if (structured && type !== 'ASQ' && !responseLines.length) { status('Enter your answer first.', true); return; }
   const context = $('context').value.trim(); if (!context) { status('Enter the question context first.', true); return; }
   busy = true; $('submit').disabled = true; $('submit').textContent = 'Analyzing…'; $('sample').disabled = true;
   $('type').disabled = true;
   $('results').hidden = true; $('empty').hidden = false; $('download').hidden = true; lastResult = null;
-  const semantic=['DI','RL','SGD','RTS','SWT','WE','SST'].includes(type);
+  const semantic = ['DI', 'RL', 'SGD', 'RTS', 'SWT', 'WE', 'SST'].includes(type);
   status(audio ? 'Processing audio locally. The first request can take longer while the models load.' : semantic ? 'Assessing your response with the local AI model. The first request can take longer while it loads.' : 'Checking your answer.');
   const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 240000);
   try {
     const question = { id: `ui-${Date.now()}`, type };
-    if (['RA','RS','RL','SGD','SWT','SST','WFD','FIB','FIB_DD','FIB_L','RO'].includes(type)) question.reference = context;
+    if (['RA', 'RS', 'RL', 'SGD', 'SWT', 'SST', 'WFD', 'FIB', 'FIB_DD', 'FIB_L', 'RO'].includes(type)) question.reference = context;
     else question.prompt = context;
     if (structured) {
-      question.correct = ARRAY_TYPES.has(type) ? keyLines : type==='ASQ' ? keyLines : keyLines[0];
-      if (type!=='ASQ') question.response = ARRAY_TYPES.has(type) ? responseLines : responseLines[0] || '';
-      const options=$('options').value.split('\n').map(x=>x.trim()).filter(Boolean);
-      if (options.length) question.options=options;
+      question.correct = ARRAY_TYPES.has(type) ? keyLines : type === 'ASQ' ? keyLines : keyLines[0];
+      if (type !== 'ASQ') question.response = ARRAY_TYPES.has(type) ? responseLines : responseLines[0] || '';
+      const options = $('options').value.split('\n').map(x => x.trim()).filter(Boolean);
+      if (options.length) question.options = options;
     }
     const headers = { 'Content-Type': 'application/json' }; if ($('service-key').value) headers['X-Service-Key'] = $('service-key').value;
     if (typed) question.response = $('writing-answer').value.trim();

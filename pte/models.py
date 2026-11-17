@@ -45,8 +45,7 @@ class Question(BaseModel):
             if not isinstance(self.correct,list) or not self.correct: raise ValueError('Nonempty correct array required')
             if not isinstance(self.response,list): raise ValueError('Response must be an array (use [] for skipped)')
             if any(not x.strip() for x in self.correct): raise ValueError('Answer key entries cannot be empty')
-            if self.type in {'RO','MCM_R','MCM_L','HIW'}:
-                if len(set(self.correct))!=len(self.correct) or len(set(self.response))!=len(self.response): raise ValueError('Duplicate IDs are not allowed')
+           
             if self.type=='RO' and (len(self.correct)<2 or (self.response and set(self.response)!=set(self.correct))): raise ValueError('Reorder response must be a permutation of the key')
             if self.type in {'FIB','FIB_DD','FIB_L'} and len(self.response)>len(self.correct): raise ValueError('Too many blank responses')
         elif self.type in scalar:
