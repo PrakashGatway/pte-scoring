@@ -88,7 +88,7 @@ function render(data) {
   $('result-state').className = 'result-state' + (data.status === 'pending' ? ' pending' : '');
   const writingData = data.writing;
   const writing = ['SWT', 'WE', 'SST'].includes(data.type);
-  const semantic = ['DI', 'RL', 'SGD', 'RTS', 'SWT', 'WE', 'SST'].includes(data.type);
+  const semantic = ['DI', 'RL', 'SGD', 'RTS', 'SWT', 'WE', 'SST', 'ASQ'].includes(data.type);
   $('result-state').textContent = data.status === 'pending' ? `Partial result · pending: ${data.pending_traits.join(', ').replaceAll('_', ' ')}` : data.type === 'RA' ? 'Read Aloud · normalized 0–5 practice scale' : semantic ? (data.traits.form?.score === 0 ? 'Form check complete · response outside writing requirements' : 'Published rubric · local AI estimate') : data.audio?.proxy_scores_used ? 'Published rubric · experimental audio estimates' : 'Published item scoring rules';
   $('score-label').textContent = data.type === 'RA' ? 'Read Aloud practice score' : 'Question points';
   $('score').textContent = data.score == null ? 'Pending' : `${data.score} / ${data.max_score}`;
@@ -165,7 +165,7 @@ function render(data) {
   $('pace').textContent = hasAudio ? `${data.audio.words_per_minute} words/min` : '';
   $('confidence').textContent = hasAudio ? `${(data.audio.recognition_confidence * 100).toFixed(1)}%` : '';
   $('feedback').replaceChildren();
-  for (const message of data.feedback.length ? data.feedback : ['No additional feedback.']) { const li = document.createElement('li'); li.textContent = message; $('feedback').append(li); }
+  for (const message of data.feedback.length ? data.feedback : ['No specific mistakes were identified by the scoring checks.']) { const li = document.createElement('li'); li.textContent = message; $('feedback').append(li); }
   $('json').textContent = JSON.stringify(data, null, 2);
 }
 $('form').addEventListener('submit', async e => {

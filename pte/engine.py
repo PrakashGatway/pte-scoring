@@ -7,6 +7,14 @@ from .llm import OllamaAssessor, AssessmentUnavailable
 def tokens(text):
     return re.findall(r"[\w]+(?:['’][\w]+)*",text.casefold())
 
+def contains_answer(response, answer):
+    """Match an answer as a complete word/phrase anywhere in a spoken response."""
+    response_tokens=tokens(response)
+    answer_tokens=tokens(answer)
+    if not answer_tokens or len(answer_tokens)>len(response_tokens): return False
+    return any(response_tokens[i:i+len(answer_tokens)]==answer_tokens
+               for i in range(len(response_tokens)-len(answer_tokens)+1))
+
 def alignment(reference,response):
     a,b=tokens(reference),tokens(response)
     rows=[]; errors=0; matches=0
@@ -55,18 +63,56 @@ def score_question(q,assessor=None):
         good=set(q.response)&set(q.correct); bad=set(q.response)-set(q.correct)
         trait('content',max(0,len(good)-len(bad)),len(q.correct))
         details={'correct_selected':sorted(good),'incorrect_selected':sorted(bad),'missed':sorted(set(q.correct)-set(q.response)),'penalty':len(bad)}
+        if bad: feedback.append('Incorrect selections: '+', '.join(sorted(bad))+'. Remove these; each incorrect choice reduces your points.')
+        if details['missed']: feedback.append('Missing correct selections: '+', '.join(sorted(details['missed']))+'. Review the passage/audio for these choices.')
     elif t in {'MCS_R','MCS_L','HCS','SMW','ASQ'}:
         keys=q.correct if isinstance(q.correct,list) else [q.correct]
-        normalize=(lambda s:' '.join(tokens(s))) if t=='ASQ' else (lambda s:s)
-        trait('vocabulary' if t=='ASQ' else 'content',int(normalize(q.response) in [normalize(s) for s in keys]),1)
+        if t=='ASQ':
+            matched=[answer for answer in keys if contains_answer(q.response,answer)]
+            if matched:
+                # A clear answer-key hit always earns the point, even if the
+                # learner repeats other guesses before or after it.
+                trait('vocabulary',1,1)
+                details={'matched_answers':matched,'match_source':'answer_key_phrase',
+                         'match_rule':'complete answer word or phrase may appear anywhere in the spoken response'}
+            else:
+                # ASR may render an equivalent spoken answer differently (for
+                # example, "seven" for an answer key of "7"). Ask the assessor
+                # to judge equivalence, but keep exact key matching as the
+                # deterministic path and never let a model failure break scoring.
+                try:
+                    assessment=assessor.assess(q,{'vocabulary':1})
+                    ai_score=assessment['traits']['vocabulary']
+                    trait('vocabulary',ai_score,1)
+                    feedback.extend(assessment.get('feedback',[]))
+                    details={'matched_answers':[],'match_source':'ai_semantic_answer_check',
+                             'ai_feedback':assessment.get('feedback',[])}
+                except AssessmentUnavailable:
+                    trait('vocabulary',0,1)
+                    details={'matched_answers':[],'match_source':'answer_key_phrase_no_ai_match',
+                             'match_rule':'complete answer word or phrase may appear anywhere in the spoken response'}
+                    feedback.append('The accepted answer was not detected. State the answer clearly; extra guesses do not earn credit by themselves.')
+            if t=='ASQ' and traits.get('vocabulary',{}).get('score')==1 and not feedback:
+                feedback.append('Correct answer detected. Give the answer clearly and avoid adding conflicting guesses.')
+        else:
+            is_correct=q.response in keys
+            trait('content',int(is_correct),1)
+            if not is_correct:
+                feedback.append('Your selected answer does not match the answer key. Recheck the evidence in the passage or audio before choosing.')
     elif t in {'FIB','FIB_DD','FIB_L'}:
         details['blanks']=[{'index':i,'expected':w,'actual':q.response[i] if i<len(q.response) else '',
             'correct':i<len(q.response) and w.strip().casefold()==q.response[i].strip().casefold()} for i,w in enumerate(q.correct)]
         trait('content',sum(x['correct'] for x in details['blanks']),len(q.correct))
+        wrong=[x for x in details['blanks'] if not x['correct']]
+        if wrong: feedback.append('Review blank(s) '+', '.join(str(x['index']+1) for x in wrong)+': expected '+', '.join(x['expected'] for x in wrong)+'.')
     elif t=='RO':
         pairs=set(zip(q.correct,q.correct[1:])); actual=list(zip(q.response,q.response[1:]))
         details['pairs']=[{'pair':list(p),'correct':p in pairs} for p in actual]
         trait('content',sum(p in pairs for p in actual),len(q.correct)-1)
+        wrong=[x['pair'] for x in details['pairs'] if not x['correct']]
+        if wrong:
+            details['expected_order']=q.correct
+            feedback.append('These adjacent links do not match the answer key: '+ '; '.join(' → '.join(pair) for pair in wrong)+'. Compare transition words and references, then reorder the paragraphs.')
     elif t=='WFD':
         remaining=Counter(tokens(q.reference)); rows=[]; score=0
         for w in tokens(q.response):
@@ -75,6 +121,10 @@ def score_question(q,assessor=None):
             rows.append({'word':w,'status':'correct' if correct else 'extra','strikethrough':not correct})
         rows.extend({'word':w,'status':'missed','color':'red'} for w,n in remaining.items() for _ in range(n))
         details['words']=rows; trait('content',score,len(tokens(q.reference)))
+        missing=[row['word'] for row in rows if row['status']=='missed']
+        extra=[row['word'] for row in rows if row['status']=='extra']
+        if missing: feedback.append('Words omitted or misrecognized: '+', '.join(missing)+'. Check the recording and include each missing word.')
+        if extra: feedback.append('Extra or repeated words: '+', '.join(extra)+'. Remove these and preserve the original sentence wording.')
     else:
         method='published_item_rubric_with_local_ai_estimates'
         if t=='RA': method='normalized_read_aloud_practice_scale'
@@ -91,12 +141,17 @@ def score_question(q,assessor=None):
             else:
                 ratio=matches/len(tokens(q.reference))
                 trait('content',3 if tokens(q.reference)==tokens(q.response) else 2 if ratio>=0.5 else 1 if matches else 0,3)
+            missed=[x['word'] for x in rows if x['status']=='missed']
+            extra=[x['word'] for x in rows if x['status']=='extra']
+            if missed: feedback.append('Words missed: '+', '.join(missed)+'. Practice the full sentence and keep these words in sequence.')
+            if extra: feedback.append('Added or substituted words: '+', '.join(extra)+'. Match the prompt wording more closely.')
         if 'form' in maxima:
             trait('form',form_score(t,q.response),maxima['form'])
             details['word_count']=len(tokens(q.response))
         needed={k:m for k,m in maxima.items() if k not in traits and k not in {'pronunciation','oral_fluency'}}
         if traits.get('form',{}).get('score')==0:
             feedback.append('Form is zero. The response receives no points.')
+            if t in {'SWT','WE','SST'}: feedback.append('Current word count: '+str(len(tokens(q.response)))+'. Follow the required word range, sentence count, and punctuation.')
             for k,m in maxima.items(): trait(k,0,m)
         else:
             if needed:
