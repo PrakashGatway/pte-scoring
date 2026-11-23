@@ -67,7 +67,7 @@ def gre_analytical_writing(body: GREAnalyticalWritingRequest):
 def chat(body: ChatRequest):
     try:
         answer=assessor.chat(body.message,[turn.model_dump() for turn in body.history],body.prompt)
-        return {'answer':answer,'provider':assessor.provider,'model':assessor.model}
+        return {'answer':answer,'provider':assessor.provider,'model':assessor.chat_model_identifier}
     except Exception as e:
         raise HTTPException(503,'Chat model unavailable: '+type(e).__name__) from e
 

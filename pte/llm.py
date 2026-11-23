@@ -73,6 +73,8 @@ class LocalAssessor:
         self.provider=os.getenv('PTE_LLM_PROVIDER','llama_cpp')
         self._local=None
         self._local_path=None
+        self._chat_local=None
+        self._chat_local_path=None
         self._lock=threading.Lock()
 
     def model_path(self, question_type):
@@ -81,6 +83,16 @@ class LocalAssessor:
         if question_type in {'SWT','WE','GRE_AW'}:
             return os.getenv('PTE_WRITING_MODEL_PATH') or os.getenv('PTE_MODEL_PATH') or default
         return os.getenv('PTE_MODEL_PATH') or default
+
+    def chat_model_path(self):
+        root=Path(__file__).resolve().parents[1]
+        default=str(root/'models/qwen/qwen2.5-0.5b-instruct-q5_k_m.gguf')
+        return os.getenv('PTE_CHAT_MODEL_PATH') or default
+
+    @property
+    def chat_model_identifier(self):
+        if self.provider=='ollama': return os.getenv('OLLAMA_CHAT_MODEL',self.model)
+        return Path(self.chat_model_path()).name
 
     def assess(self,question,traits):
         if not self.enabled: raise AssessmentUnavailable('LLM is disabled; set PTE_LLM_ENABLED=1')
@@ -226,20 +238,19 @@ class LocalAssessor:
         messages.append({'role':'user','content':user_content})
         try:
             if self.provider=='ollama':
-                data={'model':self.model,'stream':False,'messages':messages,'options':{'temperature':0.3}}
+                chat_model=os.getenv('OLLAMA_CHAT_MODEL',self.model)
+                data={'model':chat_model,'stream':False,'messages':messages,'options':{'temperature':0.3}}
                 req=urllib.request.Request(self.base+'/api/chat',json.dumps(data).encode(),{'Content-Type':'application/json'})
                 with urllib.request.urlopen(req,timeout=120) as r: result=json.load(r)
                 answer=result.get('message',{}).get('content','').strip()
             else:
                 from llama_cpp import Llama
-                model_path=self.model_path('CHAT')
+                model_path=self.chat_model_path()
                 with self._lock:
-                    if self._local is not None and self._local_path!=model_path:
-                        self._local.close(); self._local=None; self._local_path=None
-                    if self._local is None:
-                        self._local=Llama(model_path=model_path,n_ctx=4096,n_threads=4,verbose=False,chat_format='chatml')
-                        self._local_path=model_path
-                    result=self._local.create_chat_completion(messages=messages,temperature=0.3,max_tokens=700)
+                    if self._chat_local is None:
+                        self._chat_local=Llama(model_path=model_path,n_ctx=2048,n_threads=4,verbose=False,chat_format='chatml')
+                        self._chat_local_path=model_path
+                    result=self._chat_local.create_chat_completion(messages=messages,temperature=0.3,max_tokens=500)
                 answer=result['choices'][0]['message']['content'].strip()
             if not answer: raise ValueError('Empty model response')
             return answer[:12000]

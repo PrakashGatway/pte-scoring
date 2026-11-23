@@ -32,6 +32,8 @@ $env:PTE_MODEL_PATH = 'C:\models\your-instruct-model.gguf'
 $env:PTE_WHISPER_MODEL = 'small.en'
 ```
 
+Chat uses a separate lightweight local Qwen 0.5B model by default (`models/qwen/qwen2.5-0.5b-instruct-q5_k_m.gguf`) so chat does not unload or compete with the 3B scoring model. Override it with `PTE_CHAT_MODEL_PATH`; when using Ollama, set `OLLAMA_CHAT_MODEL`. This chat model is not used for PTE, essay, GRE, or audio scoring.
+
 Use the same service key in Node. Do not expose this inference service directly to the public. Authenticate users and fetch answer keys and acoustic evidence in your Node backend.
 
 ## Node integration

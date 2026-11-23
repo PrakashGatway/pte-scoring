@@ -46,11 +46,22 @@ class AudioProcessor:
         if body.question.type not in SPOKEN|{'ASQ'}: raise ValueError('Audio response only allowed for speaking questions')
         from faster_whisper import WhisperModel
         from faster_whisper.audio import decode_audio
-        try: data=base64.b64decode(body.audio_base64,validate=True)
+        encoded=body.audio_base64.strip()
+        # Browser FileReader clients sometimes send a complete data URL.
+        # Accept it as well as raw Base64 so the API is usable from both Node
+        # and browser clients.
+        if encoded.startswith('data:'):
+            try: encoded=encoded.split(',',1)[1]
+            except IndexError as e: raise ValueError('Invalid audio data URL') from e
+        encoded=''.join(encoded.split())
+        try:
+            encoded += '=' * (-len(encoded) % 4)
+            data=base64.b64decode(encoded,validate=True)
         except Exception as e: raise ValueError('Invalid base64 audio') from e
         if len(data)>10000000: raise ValueError('Audio exceeds 10MB')
         try: waveform=decode_audio(io.BytesIO(data),sampling_rate=16000)
-        except Exception as e: raise ValueError('Cannot decode audio') from e
+        except Exception as e:
+            raise ValueError('Cannot decode audio; send a valid WAV, MP3, or WebM recording') from e
         duration=len(waveform)/16000
         if not 0.01<=duration<=300: raise ValueError('Audio duration must be 0.25–240 seconds')
         # Silence is checked before inference to avoid hallucinated silent transcripts.
